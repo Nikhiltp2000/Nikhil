@@ -1,4 +1,4 @@
-package com.atdxt.JdbcConnection;
+package com.atdxt.JdbcConnection.Model;
 
 public class User {
     private Long id;

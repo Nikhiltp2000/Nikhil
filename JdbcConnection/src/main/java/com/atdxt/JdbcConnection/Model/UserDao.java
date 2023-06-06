@@ -1,4 +1,4 @@
-package com.atdxt.JdbcConnection;
+package com.atdxt.JdbcConnection.Model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,6 +20,12 @@ public class UserDao {
             String email = resultSet.getString("email");
             return new User(id, name,email);
         });
+    }
+
+
+    public void createUser(User user) {
+        String sql = "INSERT INTO Employee (name, email) VALUES (?, ?)";
+        jdbcTemplate.update(sql, user.getName(), user.getEmail());
     }
 }
 
