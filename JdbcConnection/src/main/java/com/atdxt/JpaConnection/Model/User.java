@@ -1,11 +1,23 @@
-package com.atdxt.JdbcConnection.Model;
+package com.atdxt.JpaConnection.Model;
 
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String email;
     // Other properties, constructors, getters, and setters
 
+    //default constructor
+    public User() {
+    }
     // Constructor
     public User(Long id, String name, String email) {
         this.id = id;
