@@ -13,9 +13,6 @@
                 <pattern>%d %p %C{1.} [%t] %m%n</pattern>
             </PatternLayout>
             <Policies>
-                <OnStartupTriggeringPolicy />
-                <SizeBasedTriggeringPolicy
-                        size="10 MB" />
                 <TimeBasedTriggeringPolicy interval="5" />
             </Policies>
         </RollingFile>
