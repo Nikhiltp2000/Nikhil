@@ -1,9 +1,10 @@
 package com.atdxt.JpaConnection.Service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import com.atdxt.JpaConnection.Model.User;
 import com.atdxt.JpaConnection.Repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private static final Logger logger = LogManager.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
 
     @Autowired
