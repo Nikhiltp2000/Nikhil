@@ -11,8 +11,20 @@
     </parent>
 
     <artifactId>Controller</artifactId>
+    <packaging>war</packaging>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <version>3.1.0</version>
+        </dependency>
         <dependency>
             <groupId>com.atdxt</groupId>
             <artifactId>Repository</artifactId>
@@ -34,9 +46,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
     </properties>
 
 
@@ -46,8 +56,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-
                     <skip>false</skip>
                 </configuration>
             </plugin>
