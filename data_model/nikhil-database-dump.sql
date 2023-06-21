@@ -31,16 +31,6 @@ CREATE TABLE `Employee` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Employee`
---
-
-LOCK TABLES `Employee` WRITE;
-/*!40000 ALTER TABLE `Employee` DISABLE KEYS */;
-INSERT INTO `Employee` VALUES (1,'Nikhil','nikhil@example.com'),(2,'Anika','anika@example.com'),(3,'Anu','anu@example.com'),(4,'Janu','janu@example.com');
-/*!40000 ALTER TABLE `Employee` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user`
 --
 
@@ -54,16 +44,6 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user`
---
-
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'janu@example.com','Janu'),(2,'nikhil@example.com','Nikhil'),(3,'anu@example.com','Anu'),(4,'anu@example.com',NULL),(5,'ram@example.com',NULL),(6,'ram@example.com','Ram'),(7,'ram@example.com','Ram'),(8,'nikhil@email.com','nikhil'),(9,'vimal@example.com','vimal'),(10,'nikhil@example.com','nikhil'),(11,'anika@example.com','anika'),(12,'john@example.com','john');
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -74,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-20 16:31:58
+-- Dump completed on 2023-06-21  9:30:34
