@@ -56,8 +56,15 @@ To build and run the application:
  - To perform the POST request and add data to the database, use : `http://localhost:8080/createuser` with the payload in json format.
  - User can use tools like postman or cURL to hit the api with the required payload.
 
+## Deployment 
+
+This project has been deployed on AWS. To access the deployed application, use the following endpoint:
+
+ - GET : `ec2-15-207-89-139.ap-south-1.compute.amazonaws.com:8080/getdata`
+ - POST : `ec2-15-207-89-139.ap-south-1.compute.amazonaws.com:8080/createuser`
+
 ## Logging
 
 This project also uses Log4j2 framework for logging. The configuration for the logging can be found in the `log4j2.xml` file located in the `src/main/resources` directory.
 
-    
+   
