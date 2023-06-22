@@ -11,6 +11,7 @@ This project is a multi-module Spring Boot application that allows users to perf
 - [Configuration](#configuration)
 - [Build and Run](#build-and-run)
 - [Usage](#usage)
+- [Deployment](#Deployment)
 - [Logging](#logging)
 
 
@@ -41,6 +42,21 @@ To configure the application:
 
 2. Update the database connection details such as `spring.datasource.url`, `spring.datasource.username`, and `spring.datasource.password` according to your MySQL configuration.
 
+3. Update the database connection details and credentials 
+   - `spring.datasource.url`: `jdbc:mysql://spring-boot-app.cxug5lvbywcj.ap-south-1.rds.amazonaws.com/db-name`
+   - `spring.datasource.username` : `nikhil`
+   - `spring.datasource.password` : `Nikhil123.`
+   - `aws.ec2.instance.name` : `spring-boot-application`
+   - `aws.ec2.instance.dns` : `ec2-3-110-118-87.ap-south-1.compute.amazonaws.com`
+
+4. This project uses AWS RDS to access use the following credentials
+   - `aws.rds.db.name` : `spring-boot-app`
+   - `aws.rds.db.endpoint` : `spring-boot-app.cxug5lvbywcj.ap-south-1.rds.amazonaws.com`
+   - `aws.rds.db.port` : `3306`
+   - `aws.rds.db.username` : `nikhil`
+   - `aws.rds.db.password` : `Nikhil123.`
+   
+
 ## Build and Run 
 
 To build and run the application:
@@ -60,8 +76,14 @@ To build and run the application:
 
 This project has been deployed on AWS. To access the deployed application, use the following endpoint:
 
- - GET : `ec2-15-207-89-139.ap-south-1.compute.amazonaws.com:8080/getdata`
- - POST : `ec2-15-207-89-139.ap-south-1.compute.amazonaws.com:8080/createuser`
+ - GET : `ec2-3-110-118-87.ap-south-1.compute.amazonaws.com:8080/getdata`
+ - POST : `ec2-3-110-118-87.ap-south-1.compute.amazonaws.com:8080/createuser`
+
+ ## cURL 
+
+ - GET : `curl http://ec2-3-110-118-87.ap-south-1.compute.amazonaws.com:8080/getdata`
+ - POST : `curl -X POST -H "Content-Type: application/json" -d '{"name":"Anika","email":"anika@example.com"}' http://ec2-3-110-118-87.ap-south-1.compute.amazonaws.com:8080/createuser`
+   
 
 ## Logging
 
