@@ -36,7 +36,7 @@ public class UserService {
             User user = optionalUser.get();
           //  Timestamp createdOn = user.getCreatedOn();
             user.setModifiedOn(Timestamp.from(Instant.now()));
-            user.setCreatedOn(user.getCreatedOn());
+          //  user.setCreatedOn(user.getCreatedOn());
             userRepository.save(user);
         }
 
