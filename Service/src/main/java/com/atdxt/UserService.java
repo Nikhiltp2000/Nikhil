@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -24,6 +25,14 @@ public class UserService {
         logger.info("Fetching all user data");
         return userRepository.findAll();
     }
+
+    //Search user by id
+    public Optional<User> getUserById(Long id){
+        logger.info("Fetching user by ID: {}" , id);
+        return userRepository.findById(id);
+    }
+
+
 
     public User saveUser(User user) {
         logger.info("Saving user: {}", user.getName());

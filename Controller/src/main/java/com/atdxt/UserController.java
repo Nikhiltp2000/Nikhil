@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping
@@ -35,6 +36,25 @@ public class UserController {
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             logger.error("Error occurred while fetching users: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    //get mapping to find user by id
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+        try{
+            Optional<User> optionalUser = userService.getUserById(id);
+            if (optionalUser.isPresent()){
+                User user = optionalUser.get();
+                logger.info("Found user with ID: {}", id );
+                return ResponseEntity.ok(user);
+            } else {
+                logger.warn("User with ID {} not found",id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching user with ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
