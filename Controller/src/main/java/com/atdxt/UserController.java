@@ -27,7 +27,7 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
+    // Fetch all data from the database
     @GetMapping("/getdata")
     public ResponseEntity<List<User>> getAllUsers() {
         try {
@@ -59,6 +59,34 @@ public class UserController {
         }
     }
 
+    // update the user value by Id
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        try {
+            Optional<User> optionalUser = userService.getUserById(id);
+            if (optionalUser.isPresent()) {
+                User existingUser = optionalUser.get();
+
+                // Update the properties of the existing user
+                existingUser.setName(updatedUser.getName());
+                existingUser.setEmail(updatedUser.getEmail());
+
+                User updatedUserResult = userService.saveUser(existingUser);
+                logger.info("Updated user with ID: {}", id);
+                return ResponseEntity.ok(updatedUserResult);
+            } else {
+                logger.warn("User with ID {} not found", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while updating user with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+    // create user
     @PostMapping("/createuser")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
         try {
