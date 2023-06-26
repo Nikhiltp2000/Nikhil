@@ -14,6 +14,7 @@ public class User {
     private String email;
 
     private Timestamp modifiedOn;
+    @Column(name = "created_on", updatable = false)
     private Timestamp createdOn;
     // Other properties, constructors, getters, and setters
 
