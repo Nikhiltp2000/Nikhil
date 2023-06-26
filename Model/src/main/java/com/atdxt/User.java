@@ -1,9 +1,9 @@
 package com.atdxt;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 public class User {
@@ -12,11 +12,22 @@ public class User {
     private Long id;
     private String name;
     private String email;
+
+    private Timestamp modifiedOn;
+    private Timestamp createdOn;
     // Other properties, constructors, getters, and setters
+
+//    @Column(name = "created_on" ,updatable = false)
+//    private Timestamp createdOn;
+
+
+//    @Column(name = "modified_on")
+//    private Timestamp modifiedOn;
 
     //default constructor
     public User() {
     }
+
     // Constructor
     public User(Long id, String name, String email) {
         this.id = id;
@@ -40,6 +51,24 @@ public class User {
         return name;
     }
 
+    public Timestamp getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Timestamp createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Timestamp getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(Timestamp modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+
+
     public void setName(String name) {
         this.name = name;
     }
@@ -51,4 +80,20 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
+    @PrePersist
+    public void prePersist(){
+        Timestamp currentTimestamp = Timestamp.from(Instant.now());
+        createdOn = currentTimestamp;
+        modifiedOn = currentTimestamp;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        modifiedOn = Timestamp.from(Instant.now());
+    }
 }
+
+
+
