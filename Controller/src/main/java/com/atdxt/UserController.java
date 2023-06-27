@@ -71,6 +71,15 @@ public class UserController {
                 existingUser.setName(updatedUser.getName());
                 existingUser.setEmail(updatedUser.getEmail());
 
+                Address existingAddress = existingUser.getAddress();
+                if (existingAddress != null) {
+                    // Update the properties of the existing address
+                    Address updatedAddress = updatedUser.getAddress();
+                    existingAddress.setStreet(updatedAddress.getStreet());
+                    existingAddress.setCity(updatedAddress.getCity());
+                    existingAddress.setCountry(updatedAddress.getCountry());
+                }
+
                 User updatedUserResult = userService.saveUser(existingUser);
                 logger.info("Updated user with ID: {}", id);
                 return ResponseEntity.ok(updatedUserResult);

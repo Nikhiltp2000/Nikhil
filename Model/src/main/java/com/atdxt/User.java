@@ -1,5 +1,6 @@
 package com.atdxt;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -12,6 +13,10 @@ public class User {
     private Long id;
     private String name;
     private String email;
+//    @JsonIgnoreProperties("user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY )
+    @JsonIgnoreProperties("user")
+    private Address address;
 
     private Timestamp modifiedOn;
     @Column(name = "created_on", updatable = false)
@@ -52,6 +57,15 @@ public class User {
         return name;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+        address.setUser(this);
+    }
+
     public Timestamp getCreatedOn() {
         return createdOn;
     }
@@ -81,7 +95,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     @PrePersist
     public void prePersist(){
