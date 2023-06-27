@@ -5,10 +5,29 @@
             <PatternLayout
                     pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
         </Console>
+        <!-- ERROR LOG -->
+        <RollingFile name="ErrorFile"
+                     fileName="/var/log/jdbcConnection/error.log"
+                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i-error.log">
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
+            <PatternLayout>
+                <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <TimeBasedTriggeringPolicy interval="5" />
+            </Policies>
+        </RollingFile>
 
-        <RollingFile name="RollingFile"
-                     fileName="/var/log/jdbcConnection/application.log"
-                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log">
+        <!-- INFO LOG -->
+        <RollingFile name="InfoFile"
+                     fileName="/var/log/jdbcConnection/info.log"
+                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i-info.log">
+            <Filters>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
             <PatternLayout>
                 <pattern>%d %p %C{1.} [%t] %m%n</pattern>
             </PatternLayout>
@@ -20,17 +39,12 @@
     </Appenders>
 
     <Loggers>
-
         <Root level="info">
             <AppenderRef ref="Console" />
-            <AppenderRef ref="RollingFile" />
+            <AppenderRef ref="ErrorFile" />
+            <AppenderRef ref="InfoFile" />
         </Root>
 
-
         <Logger name="com.atdxt.JpaConnection" level="trace"></Logger>
-
-        <AppenderRef ref="RollingFile" />
-
     </Loggers>
-
 </Configuration>
