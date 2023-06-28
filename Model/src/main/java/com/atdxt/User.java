@@ -3,9 +3,10 @@ package com.atdxt;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-
+//import java.sql.Timestamp;
+//import java.time.Instant;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 @Entity
 public class User {
     @Id
@@ -18,9 +19,9 @@ public class User {
     @JsonIgnoreProperties("user")
     private Address address;
 
-    private Timestamp modifiedOn;
+    private String modifiedOn;
     @Column(name = "created_on", updatable = false)
-    private Timestamp createdOn;
+    private String createdOn;
     // Other properties, constructors, getters, and setters
 
 //    @Column(name = "created_on" ,updatable = false)
@@ -66,19 +67,35 @@ public class User {
         address.setUser(this);
     }
 
-    public Timestamp getCreatedOn() {
+//    public Timestamp getCreatedOn() {
+//        return createdOn;
+//    }
+//
+//    public void setCreatedOn(Timestamp createdOn) {
+//        this.createdOn = createdOn;
+//    }
+//
+//    public Timestamp getModifiedOn() {
+//        return modifiedOn;
+//    }
+//
+//    public void setModifiedOn(Timestamp modifiedOn) {
+//        this.modifiedOn = modifiedOn;
+//    }
+
+    public String getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(Timestamp createdOn) {
+    public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
 
-    public Timestamp getModifiedOn() {
+    public String getModifiedOn() {
         return modifiedOn;
     }
 
-    public void setModifiedOn(Timestamp modifiedOn) {
+    public void setModifiedOn(String modifiedOn) {
         this.modifiedOn = modifiedOn;
     }
 
@@ -96,17 +113,34 @@ public class User {
         this.email = email;
     }
 
+//    @PrePersist
+//    public void prePersist(){
+//        Timestamp currentTimestamp = Timestamp.from(Instant.now());
+//        createdOn = currentTimestamp;
+//        modifiedOn = currentTimestamp;
+//    }
+//
+//    @PreUpdate
+//    public void preUpdate() {
+//        modifiedOn = Timestamp.from(Instant.now());
+//    }
+
+    // PrePersist and PreUpdate methods
     @PrePersist
-    public void prePersist(){
-        Timestamp currentTimestamp = Timestamp.from(Instant.now());
-        createdOn = currentTimestamp;
-        modifiedOn = currentTimestamp;
+    public void prePersist() {
+        Date currentDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+        createdOn = formatter.format(currentDate);
+        modifiedOn = formatter.format(currentDate);
     }
 
     @PreUpdate
     public void preUpdate() {
-        modifiedOn = Timestamp.from(Instant.now());
+        Date currentDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+        modifiedOn = formatter.format(currentDate);
     }
+
 }
 
 
