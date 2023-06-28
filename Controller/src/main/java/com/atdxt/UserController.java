@@ -50,7 +50,7 @@ public class UserController {
                 logger.info("Found user with ID: {}", id );
                 return ResponseEntity.ok(user);
             } else {
-                logger.warn("User with ID {} not found",id);
+                logger.error("User with ID {} not found",id);
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
