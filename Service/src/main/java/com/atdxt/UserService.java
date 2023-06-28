@@ -1,7 +1,5 @@
 package com.atdxt;
 
-import com.atdxt.User;
-import com.atdxt.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 @Service
 public class UserService {
 
@@ -38,7 +37,8 @@ public class UserService {
         if (optionalUser.isPresent()){
             User user = optionalUser.get();
           //  Timestamp createdOn = user.getCreatedOn();
-            user.setModifiedOn(Timestamp.from(Instant.now()));
+          //  user.setModifiedOn(Timestamp.from(Instant.now()));
+            user.setModifiedOn(formatDate(new Date()));
           //  user.setCreatedOn(user.getCreatedOn());
             userRepository.save(user);
         }
@@ -67,13 +67,19 @@ public class UserService {
 
     public User saveUser(User user) {
         logger.info("Saving user: {}", user.getName());
-        Timestamp currentTimestamp = Timestamp.from(Instant.now());
-        user.setCreatedOn(currentTimestamp);
-        user.setModifiedOn(currentTimestamp);
+        user.setCreatedOn(formatDate(new Date()));
+        user.setModifiedOn(formatDate(new Date()));
+
+     //   Timestamp currentTimestamp = Timestamp.from(Instant.now());
+       // user.setCreatedOn(currentTimestamp);
+        //user.setModifiedOn(currentTimestamp);
+
 
         if (user.getAddress() != null) {
             Address address = user.getAddress();
             address.setUser(user);
+            address.setCreatedOn(formatDate(new Date()));
+            address.setModifiedOn(formatDate(new Date()));
             address.setCity(address.getCity());
             address.setCountry(address.getCountry());
             address.setStreet(address.getStreet());
@@ -81,6 +87,11 @@ public class UserService {
             user.setAddress(address);
         }
         return userRepository.save(user);
+    }
+
+    private String formatDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yy:MM:dd HH:mm:ss");
+        return dateFormat.format(date);
     }
 
 }
