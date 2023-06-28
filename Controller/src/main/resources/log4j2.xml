@@ -8,7 +8,7 @@
         <!-- ERROR LOG -->
         <RollingFile name="ErrorFile"
                      fileName="/var/log/jdbcConnection/error.log"
-                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i-error.log">
+                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i-error.log" append="true">
             <Filters>
                 <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
             </Filters>
@@ -17,14 +17,15 @@
             </PatternLayout>
             <Policies>
                 <OnStartupTriggeringPolicy />
-                <TimeBasedTriggeringPolicy interval="5" />
+                <TimeBasedTriggeringPolicy interval="5" modulate="true" />
             </Policies>
+            <DefaultRolloverStrategy max="30" />
         </RollingFile>
 
         <!-- INFO LOG -->
         <RollingFile name="InfoFile"
                      fileName="/var/log/jdbcConnection/info.log"
-                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i-info.log">
+                     filePattern="/var/log/jdbcConnection/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i-info.log" append="true">
             <Filters>
                 <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
             </Filters>
@@ -33,8 +34,9 @@
             </PatternLayout>
             <Policies>
                 <OnStartupTriggeringPolicy />
-                <TimeBasedTriggeringPolicy interval="5" />
+                <TimeBasedTriggeringPolicy interval="5" modulate="true" />
             </Policies>
+            <DefaultRolloverStrategy max="30" />
         </RollingFile>
     </Appenders>
 
@@ -47,4 +49,6 @@
 
         <Logger name="com.atdxt.JpaConnection" level="trace"></Logger>
     </Loggers>
+
+
 </Configuration>
