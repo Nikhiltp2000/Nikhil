@@ -3,6 +3,9 @@ package com.atdxt;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Entity
 public class Address {
     @Id
@@ -11,6 +14,10 @@ public class Address {
     private String street;
     private String city;
     private String country;
+
+    private String modifiedOn;
+    @Column(name = "created_on", updatable = false)
+    private String createdOn;
 
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
@@ -66,6 +73,23 @@ public class Address {
         this.country = country;
     }
 
+
+    public String getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(String modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    public String getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(String createdOn) {
+        this.createdOn = createdOn;
+    }
+
     public User getUser() {
         return user;
     }
@@ -73,5 +97,22 @@ public class Address {
     public void setUser(User user) {
         this.user = user;
     }
+
+    // PrePersist and PreUpdate methods
+    @PrePersist
+    public void prePersist() {
+        Date currentDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+        createdOn = formatter.format(currentDate);
+        modifiedOn = formatter.format(currentDate);
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        Date currentDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+        modifiedOn = formatter.format(currentDate);
+    }
+
 }
 
