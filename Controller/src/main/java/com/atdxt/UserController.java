@@ -13,8 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping
@@ -23,10 +24,14 @@ public class UserController {
 
     private final UserService userService;
 
+    private final AuthRepository authRepository;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthRepository authRepository) {
         this.userService = userService;
+        this.authRepository = authRepository;
     }
+
     // Fetch all data from the database
     @GetMapping("/getdata")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -42,15 +47,15 @@ public class UserController {
 
     //get mapping to find user by id
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id){
-        try{
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        try {
             Optional<User> optionalUser = userService.getUserById(id);
-            if (optionalUser.isPresent()){
+            if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                logger.info("Found user with ID: {}", id );
+                logger.info("Found user with ID: {}", id);
                 return ResponseEntity.ok(user);
             } else {
-                logger.error("User with ID {} not found",id);
+                logger.error("User with ID {} not found", id);
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
@@ -94,7 +99,6 @@ public class UserController {
     }
 
 
-
     // create user
     @PostMapping("/createuser")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
@@ -109,5 +113,44 @@ public class UserController {
     }
 
 
-}
 
+    @PostMapping("/createauth")
+    public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
+        /*try {*/
+            Auth userEncrypt1 = new Auth();
+            userEncrypt1.setUsername(userEntity3.getUsername());
+            userEncrypt1.setPassword(userEntity3.getPassword());
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            userEncrypt1.setCreatedOn(sdf1.format(new Date()));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            userEncrypt1.setModifiedOn(sdf.format(new Date()));
+
+            userEncrypt1.encryptPassword();
+            authRepository.save(userEncrypt1);
+
+            logger.info("User added successfully");
+            return ResponseEntity.ok("User added successfully");
+       /* } catch (Exception e) {
+            logger.error("Error occurred while adding user to the database", e);
+            throw new CustomException("Error occurred while adding user to the database.");
+        }*/
+    }
+
+
+
+    @GetMapping("/getauth")
+    public List<Auth> getUserData() {
+
+            List<Auth> userEncryptList = authRepository.findAll();
+            for (Auth userEntity3 : userEncryptList) {
+                userEntity3.decryptPassword();
+            }
+            logger.info("Fetching all users");
+            return userEncryptList;
+
+    }
+
+
+
+}
