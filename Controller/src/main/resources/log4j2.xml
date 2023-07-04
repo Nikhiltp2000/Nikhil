@@ -47,8 +47,9 @@
             <AppenderRef ref="InfoFile" />
         </Root>
 
-        <Logger name="com.atdxt.JpaConnection" level="trace"></Logger>
+        <Logger name="com.atdxt.JpaConnection" level="error">
+            <AppenderRef ref="ErrorFile" />
+        </Logger>
     </Loggers>
-
 
 </Configuration>

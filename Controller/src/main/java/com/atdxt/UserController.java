@@ -117,6 +117,7 @@ public class UserController {
     @PostMapping("/createauth")
     public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
         /*try {*/
+
             Auth userEncrypt1 = new Auth();
             userEncrypt1.setUsername(userEntity3.getUsername());
             userEncrypt1.setPassword(userEntity3.getPassword());
@@ -130,11 +131,8 @@ public class UserController {
             authRepository.save(userEncrypt1);
 
             logger.info("User added successfully");
+        //    logger.info("Saved user: {}", savedUser.getName());
             return ResponseEntity.ok("User added successfully");
-       /* } catch (Exception e) {
-            logger.error("Error occurred while adding user to the database", e);
-            throw new CustomException("Error occurred while adding user to the database.");
-        }*/
     }
 
 
@@ -150,7 +148,5 @@ public class UserController {
             return userEncryptList;
 
     }
-
-
 
 }
