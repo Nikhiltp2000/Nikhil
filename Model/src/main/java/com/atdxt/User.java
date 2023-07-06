@@ -14,6 +14,13 @@ public class User {
     private Long id;
     private String name;
     private String email;
+
+    private String lastname;
+
+
+    private String role;
+
+
 //    @JsonIgnoreProperties("user")
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY )
     @JsonIgnoreProperties("user")
@@ -36,10 +43,12 @@ public class User {
     }
 
     // Constructor
-    public User(Long id, String name, String email) {
+    public User(Long id, String name, String email,String lastname,String role) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.lastname=lastname;
+        this.role=role;
     }
 
     // Getters and Setters
@@ -53,9 +62,28 @@ public class User {
         this.id = id;
     }
 
+
+
+
     public String getName() {
 
         return name;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public Address getAddress() {

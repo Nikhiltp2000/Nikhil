@@ -56,8 +56,32 @@ public class UserService {
     }
 
 
+ /*   public User saveUser(User user) {
+        logger.info("Saving user: {}", user.getName());
+        user.setCreatedOn(formatDate(new Date()));
+        user.setModifiedOn(formatDate(new Date()));
 
-    public User saveUser(User user) {
+        if (user.getLastname() != null && user.getAddress() != null) {
+            Address address = user.getAddress();
+            address.setUser(user);
+            address.setCreatedOn(formatDate(new Date()));
+            address.setModifiedOn(formatDate(new Date()));
+            address.setCity(address.getCity());
+            address.setCountry(address.getCountry());
+            address.setStreet(address.getStreet());
+            // addressRepository.save(address);
+            user.setAddress(address);
+        }
+
+        // Set the role and lastname fields
+        user.setRole(user.getRole());
+        user.setLastname(user.getLastname());
+
+        return userRepository.save(user);
+    }*/
+
+// original code
+/*    public User saveUser(User user) {
         logger.info("Saving user: {}", user.getName());
         user.setCreatedOn(formatDate(new Date()));
         user.setModifiedOn(formatDate(new Date()));
@@ -73,10 +97,58 @@ public class UserService {
            // addressRepository.save(address);
             user.setAddress(address);
         }
+
+
+
+        return userRepository.save(user);
+    }*/
+
+    public User saveUser(User user) {
+        logger.info("Saving user: {}", user.getName());
+        user.setCreatedOn(formatDate(new Date()));
+        user.setModifiedOn(formatDate(new Date()));
+
+        if (user.getAddress() != null && user.getAddress().getStreet() != null &&
+                user.getAddress().getCity() != null && user.getAddress().getCountry() != null) {
+            // Save user with new columns
+            return saveUserWithNewColumns(user);
+        } else {
+            // Save user without new columns
+            return saveUserWithoutNewColumns(user);
+        }
+    }
+
+    private User saveUserWithNewColumns(User user) {
+        if (user.getAddress() != null) {
+            Address address = user.getAddress();
+            address.setUser(user);
+            address.setCreatedOn(formatDate(new Date()));
+            address.setModifiedOn(formatDate(new Date()));
+            address.setCity(address.getCity());
+            address.setCountry(address.getCountry());
+            address.setStreet(address.getStreet());
+            // addressRepository.save(address);
+            user.setAddress(address);
+        }
         return userRepository.save(user);
     }
 
-
+    private User saveUserWithoutNewColumns(User user) {
+        if (user.getAddress() != null) {
+            Address address = user.getAddress();
+            address.setUser(user);
+            address.setCreatedOn(formatDate(new Date()));
+            address.setModifiedOn(formatDate(new Date()));
+            address.setCity(address.getCity());
+            address.setCountry(address.getCountry());
+            address.setStreet(address.getStreet());
+            // addressRepository.save(address);
+            user.setAddress(address);
+        }
+        user.setLastname(null);
+        user.setRole(null);
+        return userRepository.save(user);
+    }
 
 
     private String formatDate(Date date) {

@@ -98,11 +98,11 @@ public class UserController {
         }
     }
 
-
     // create user
     @PostMapping("/createuser")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
         try {
+
             User savedUser = userService.saveUser(user);
             logger.info("Saved user: {}", savedUser.getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
@@ -111,7 +111,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 
     @PostMapping("/createauth")
