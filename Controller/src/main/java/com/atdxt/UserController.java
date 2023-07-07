@@ -6,6 +6,7 @@ import com.atdxt.User;
 import com.atdxt.UserService;
 
 //import org.apache.logging.log4j.LogManager;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,8 @@ public class UserController {
                 // Update the properties of the existing user
                 existingUser.setName(updatedUser.getName());
                 existingUser.setEmail(updatedUser.getEmail());
+                existingUser.setLastname(updatedUser.getLastname());
+                existingUser.setRole(updatedUser.getRole());
 
                 Address existingAddress = existingUser.getAddress();
                 if (existingAddress != null) {
@@ -98,24 +101,48 @@ public class UserController {
         }
     }
 
+
+
     // create user
-    @PostMapping("/createuser")
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        try {
+        @PostMapping("/createuser")
+        public ResponseEntity<Object> saveUser(@RequestBody User user) {
+            try {
+                if (!userService.isValidEmail(user.getEmail())) {
+                    String errorMessage = "Invalid email format!!,Please Enter valid email id";
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("ErrorMessage", errorMessage);
+                    errorResponse.put("Input Email", user.getEmail());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
+                if (userService.isNameExists(user.getName())) {
+                    String errorMessage = "Name already exists";
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("ErrorMessage", errorMessage);
+                    errorResponse.put("Input Name", user.getName());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
 
-            User savedUser = userService.saveUser(user);
-            logger.info("Saved user: {}", savedUser.getName());
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-        } catch (Exception e) {
-            logger.error("Error occurred while saving user: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                if (userService.isEmailExists(user.getEmail())) {
+                    String errorMessage = "Email already exists";
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("ErrorMessage", errorMessage);
+                    errorResponse.put("Input Email", user.getEmail());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
+
+                User savedUser = userService.saveUser(user);
+                logger.info("Saved user: {}", savedUser.getName());
+               return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+            } catch (Exception e) {
+                logger.error("Error occurred while saving user: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
         }
-    }
 
 
-    @PostMapping("/createauth")
-    public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
-        /*try {*/
+        @PostMapping("/createauth")
+        public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
+            /*try {*/
 
             Auth userEncrypt1 = new Auth();
             userEncrypt1.setUsername(userEntity3.getUsername());
@@ -130,22 +157,17 @@ public class UserController {
             authRepository.save(userEncrypt1);
 
             logger.info("User added successfully");
-        //    logger.info("Saved user: {}", savedUser.getName());
+            //    logger.info("Saved user: {}", savedUser.getName());
             return ResponseEntity.ok("User added successfully");
-    }
+        }
 
-
-
-    @GetMapping("/getauth")
-    public List<Auth> getUserData() {
-
+        @GetMapping("/getauth")
+        public List<Auth> getUserData() {
             List<Auth> userEncryptList = authRepository.findAll();
             for (Auth userEntity3 : userEncryptList) {
                 userEntity3.decryptPassword();
             }
             logger.info("Fetching all users");
             return userEncryptList;
-
+        }
     }
-
-}
