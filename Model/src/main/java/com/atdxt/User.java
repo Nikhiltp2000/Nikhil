@@ -1,6 +1,7 @@
 package com.atdxt;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 //import java.sql.Timestamp;
@@ -8,6 +9,7 @@ import jakarta.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +18,6 @@ public class User {
     private String email;
 
     private String lastname;
-
 
     private String role;
 
