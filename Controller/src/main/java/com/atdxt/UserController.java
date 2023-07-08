@@ -137,7 +137,7 @@ public class UserController {
                 logger.error("Error occurred while saving user: {}", e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-        }
+       }
 
 
         @PostMapping("/createauth")
