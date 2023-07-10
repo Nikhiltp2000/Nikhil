@@ -96,7 +96,7 @@ public class UserController {
                     existingAddress.setCountry(updatedAddress.getCountry());
                 }
 
-                User updatedUserResult = userService.saveUser(existingUser);
+                User updatedUserResult = userService.saveUser(existingUser,true);
                 logger.info("Updated user with ID: {}", id);
                 return ResponseEntity.ok(updatedUserResult);
             } else {
@@ -167,7 +167,7 @@ public class UserController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
                 }
 
-                User savedUser = userService.saveUser(user);
+                User savedUser = userService.saveUser(user,false);
                 logger.info("Saved user: {}", savedUser.getName());
                return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
             } catch (Exception e) {

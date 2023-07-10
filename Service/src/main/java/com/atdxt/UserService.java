@@ -79,16 +79,16 @@ public class UserService {
         return userRepository.save(user);
     }*/
 //Save user
-    public User saveUser(User user) {
+    public User saveUser(User user, boolean isUpdate) {
         logger.info("Saving user: {}", user.getName());
         user.setCreatedOn(formatDate(new Date()));
         user.setModifiedOn(formatDate(new Date()));
 
-        if (isEmailExists(user.getEmail())) {
+        if (!isUpdate && isEmailExists(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        if (isNameExists(user.getName())) {
+        if (!isUpdate && isNameExists(user.getName())) {
             throw new IllegalArgumentException("Name already exists");
         }
 
