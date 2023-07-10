@@ -73,6 +73,14 @@ public class UserController {
             if (optionalUser.isPresent()) {
                 User existingUser = optionalUser.get();
 
+                if (updatedUser.getName() != null) {
+                    existingUser.setName(updatedUser.getName());
+                }
+
+                if (updatedUser.getEmail() != null) {
+                    existingUser.setEmail(updatedUser.getEmail());
+                }
+
                 // Update the properties of the existing user
                 existingUser.setName(updatedUser.getName());
                 existingUser.setEmail(updatedUser.getEmail());
@@ -100,6 +108,35 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+   /* @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        try {
+            Optional<User> optionalUser = userService.getUserById(id);
+            if (optionalUser.isPresent()) {
+                User existingUser = optionalUser.get();
+
+                // Update the properties of the existing user
+                if (updatedUser.getName() != null) {
+                    existingUser.setName(updatedUser.getName());
+                }
+                if (updatedUser.getEmail() != null) {
+                    existingUser.setEmail(updatedUser.getEmail());
+                }
+
+                User updatedUserResult = userService.saveUser(existingUser);
+                logger.info("Updated user with ID: {}", id);
+                return ResponseEntity.ok(updatedUserResult);
+            } else {
+                logger.warn("User with ID {} not found", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while updating user with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }*/
+
 
 
 
