@@ -34,7 +34,7 @@ public class UserController {
     }
 
     // Fetch all data from the database
-    @GetMapping("/getdata")
+    /*@GetMapping("/getdata")
     public ResponseEntity<List<User>> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
@@ -44,7 +44,38 @@ public class UserController {
             logger.error("Error occurred while fetching users: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }*/
+
+
+    @GetMapping("/getdata")
+    public String getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+            logger.info("Returned {} users", users.size());
+
+            StringBuilder table = new StringBuilder();
+            table.append("<table>")
+                    .append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Last Name</th><th>Role</th></tr>");
+
+            for (User user : users) {
+                table.append("<tr>")
+                        .append("<td>").append(user.getId()).append("</td>")
+                        .append("<td>").append(user.getName()).append("</td>")
+                        .append("<td>").append(user.getEmail()).append("</td>")
+                        .append("<td>").append(user.getLastname()).append("</td>")
+                        .append("<td>").append(user.getRole()).append("</td>")
+                        .append("</tr>");
+            }
+
+            table.append("</table>");
+
+            return table.toString();
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            return "Error occurred while fetching users";
+        }
     }
+
 
     //get mapping to find user by id
     @GetMapping("/users/{id}")
