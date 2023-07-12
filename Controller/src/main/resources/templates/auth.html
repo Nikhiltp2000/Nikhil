@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>User Details</title>
+  <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0ebeb;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>User Credentials</h1>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Password</th>
+    <th>Created On</th>
+    <th>Modified On</th>
+  </tr>
+  <tr th:each="auth : ${users}">
+    <td th:text="${auth.id}"></td>
+    <td th:text="${auth.username}"></td>
+    <td th:text="${auth.password}"></td>
+    <td th:text="${auth.createdOn}"></td>
+    <td th:text="${auth.modifiedOn}"></td>
+  </tr>
+</table>
+
+<form th:action="@{/logout}" method="post">
+  <button type="submit">Logout</button>
+</form>
+
+</body>
+</html>
