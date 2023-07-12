@@ -7,13 +7,22 @@ import com.atdxt.UserService;
 
 //import org.apache.logging.log4j.LogManager;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -47,7 +56,10 @@ public class UserController {
     }*/
 
 
-    @GetMapping("/getdata")
+
+
+
+  /*  @GetMapping("/getdata")
     public String getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
@@ -55,7 +67,7 @@ public class UserController {
 
             StringBuilder table = new StringBuilder();
             table.append("<table>")
-                    .append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Last Name</th><th>Role</th></tr>");
+                    .append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Last Name</th><th>Role</th><th>street</th><th>city</th><th>country</th></tr>");
 
             for (User user : users) {
                 table.append("<tr>")
@@ -64,9 +76,11 @@ public class UserController {
                         .append("<td>").append(user.getEmail()).append("</td>")
                         .append("<td>").append(user.getLastname()).append("</td>")
                         .append("<td>").append(user.getRole()).append("</td>")
+                        .append("<td>").append(user.getAddress().getStreet()).append("</td>")
+                        .append("<td>").append(user.getAddress().getCity()).append("</td>")
+                        .append("<td>").append(user.getAddress().getCountry()).append("</td>")
                         .append("</tr>");
             }
-
             table.append("</table>");
 
             return table.toString();
@@ -74,11 +88,42 @@ public class UserController {
             logger.error("Error occurred while fetching users: {}", e.getMessage());
             return "Error occurred while fetching users";
         }
+    }*/
+
+  /*  @GetMapping("/getdata")
+    public String getAllUsers(Model model) {
+        try {
+            List<User> users = userService.getAllUsers();
+            logger.info("Returned {} users", users.size());
+
+            model.addAttribute("users", users);
+            return "users";
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            return "error";
+        }
+    }*/
+
+    // Fetch all data from the database, Return values in tabular format
+    @GetMapping("/getdata")
+    public ModelAndView getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+            logger.info("Returned {} users", users.size());
+
+            ModelAndView modelAndView = new ModelAndView("users");
+            modelAndView.addObject("users", users);
+            return modelAndView;
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while fetching users");
+            return errorModelAndView;
+        }
     }
 
-
     //get mapping to find user by id
-    @GetMapping("/users/{id}")
+  /*  @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         try {
             Optional<User> optionalUser = userService.getUserById(id);
@@ -94,7 +139,36 @@ public class UserController {
             logger.error("Error occurred while fetching user with ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }*/
+
+//get mapping to find user by id, Return values in tabular format
+    @GetMapping("/users/{id}")
+    public ModelAndView getUserById(@PathVariable Long id) {
+        try {
+            Optional<User> optionalUser = userService.getUserById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                logger.info("Found user with ID: {}", id);
+
+                ModelAndView modelAndView = new ModelAndView("users");
+                modelAndView.addObject("users", user);
+                return modelAndView;
+            } else {
+                logger.error("User with ID {} not found", id);
+                ModelAndView errorModelAndView = new ModelAndView("error");
+                errorModelAndView.addObject("errorMessage", "User not found");
+                return errorModelAndView;
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching user with ID {}: {}", id, e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while fetching user");
+            return errorModelAndView;
+        }
     }
+
+
+
 
     // update the user value by Id
     @PutMapping("/users/{id}")
@@ -229,7 +303,7 @@ public class UserController {
             return ResponseEntity.ok("User added successfully");
         }
 
-        @GetMapping("/getauth")
+    /*    @GetMapping("/getauth")
         public List<Auth> getUserData() {
             List<Auth> userEncryptList = authRepository.findAll();
             for (Auth userEntity3 : userEncryptList) {
@@ -237,5 +311,68 @@ public class UserController {
             }
             logger.info("Fetching all users");
             return userEncryptList;
+        }*/
+
+    @GetMapping("/getauth")
+    public ModelAndView getUserData() {
+        try {
+            List<Auth> userEncryptList = authRepository.findAll();
+            for (Auth userEntity3 : userEncryptList) {
+                userEntity3.decryptPassword();
+            }
+            logger.info("Fetching all users");
+
+            ModelAndView modelAndView = new ModelAndView("auth");
+            modelAndView.addObject("users", userEncryptList);
+            return modelAndView;
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while fetching users");
+            return errorModelAndView;
         }
     }
+
+    // Logout and redirect to the login page
+    /*@GetMapping("/logout")
+    public ModelAndView logout() {
+        ModelAndView modelAndView = new ModelAndView("redirect:/login?logout");
+        return modelAndView;
+    }*/
+
+    /*@PostMapping("/logout")
+    public String logout(HttpServletRequest request) throws ServletException {
+        request.logout();
+        return "redirect:/login?logout";
+    }*/
+
+ /*   @GetMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        response.sendRedirect("/login?logout");
+    }*/
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        return "redirect:/getdata";
+    }
+
+
+    // Handle login success and redirect to the desired page
+    @PostMapping("/login")
+    public String loginSuccessHandler() {
+        return "redirect:/getdata";
+    }
+
+
+
+
+
+}
