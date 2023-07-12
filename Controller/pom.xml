@@ -25,6 +25,20 @@
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <version>3.1.0</version>
         </dependency>
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.atdxt</groupId>
             <artifactId>Repository</artifactId>
@@ -84,12 +98,8 @@
             </exclusions>
         </dependency>
 
-        <!-- Spring Security -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>3.1.0</version>
-        </dependency>
+
+
 
     </dependencies>
     <properties>
