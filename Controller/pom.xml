@@ -33,6 +33,12 @@
             <version>3.1.0</version>
         </dependency>
 
+       <!-- <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>5.6.0</version>
+        </dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -58,6 +64,9 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+
+
+
 
         <!-- Exclude Apache Logging SLF4J provider -->
         <dependency>

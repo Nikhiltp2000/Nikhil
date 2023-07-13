@@ -21,6 +21,8 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -121,6 +123,13 @@ public class UserController {
             return errorModelAndView;
         }
     }
+
+    @GetMapping("/")
+    public ModelAndView homePage() {
+        ModelAndView modelAndView = new ModelAndView("home");
+        return modelAndView;
+    }
+
 
     //get mapping to find user by id
   /*  @GetMapping("/users/{id}")
@@ -355,7 +364,7 @@ public class UserController {
         response.sendRedirect("/login?logout");
     }*/
 
-    @GetMapping("/logout")
+    /*@GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -363,16 +372,5 @@ public class UserController {
         }
         return "redirect:/getdata";
     }
-
-
-    // Handle login success and redirect to the desired page
-    @PostMapping("/login")
-    public String loginSuccessHandler() {
-        return "redirect:/getdata";
-    }
-
-
-
-
-
+*/
 }
