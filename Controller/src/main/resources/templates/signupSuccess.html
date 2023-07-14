@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Signup Success</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #007bff;
+    }
+
+    .success-message {
+      margin-bottom: 20px;
+    }
+
+    .user-info {
+      margin-bottom: 10px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      text-align: center;
+      text-decoration: none;
+      background-color: #007bff;
+      color: #ffffff;
+      border-radius: 4px;
+      border: none;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<h1>Signup Successful</h1>
+<p class="success-message">User registration successful!</p>
+<p class="user-info">Name: <span th:text="${user.name}"></span></p>
+<p class="user-info">Email: <span th:text="${user.email}"></span></p>
+
+<a th:href="@{/login}" class="button">Login</a>
+</body>
+</html>
