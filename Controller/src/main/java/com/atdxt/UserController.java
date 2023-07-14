@@ -54,7 +54,7 @@ public class UserController {
         } catch (Exception e) {
             logger.error("Error occurred while fetching users: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        }createuser
     }*/
 
 
@@ -64,7 +64,7 @@ public class UserController {
   /*  @GetMapping("/getdata")
     public String getAllUsers() {
         try {
-            List<User> users = userService.getAllUsers();
+            List<User> users = userService.getAcreateuserllUsers();
             logger.info("Returned {} users", users.size());
 
             StringBuilder table = new StringBuilder();
@@ -255,7 +255,7 @@ public class UserController {
 
 
     // create user
-        @PostMapping("/createuser")
+       /* @PostMapping("/createuser")
         public ResponseEntity<Object> saveUser(@RequestBody User user) {
             try {
                 if (!userService.isValidEmail(user.getEmail())) {
@@ -288,10 +288,52 @@ public class UserController {
                 logger.error("Error occurred while saving user: {}", e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-       }
+       }*/
+//post method for form
+    @PostMapping("/createuser")
+    public ModelAndView saveUser(@ModelAttribute("user") User user) {
+        try {
+            ModelAndView modelAndView = new ModelAndView();
+            if (!userService.isValidEmail(user.getEmail())) {
+                String errorMessage = "Invalid email format! Please enter a valid email address.";
+                modelAndView.addObject("errorMessage", errorMessage);
+                modelAndView.setViewName("signupForm");
+                return modelAndView;
+            }
+            if (userService.isNameExists(user.getName())) {
+                String errorMessage = "Name already exists. Please choose a different name.";
+                modelAndView.addObject("errorMessage", errorMessage);
+                modelAndView.setViewName("signupForm");
+                return modelAndView;
+            }
+            if (userService.isEmailExists(user.getEmail())) {
+                String errorMessage = "Email already exists. Please use a different email address.";
+                modelAndView.addObject("errorMessage", errorMessage);
+                modelAndView.setViewName("signupForm");
+                return modelAndView;
+            }
+            User savedUser = userService.saveUser(user, false);
+            modelAndView.addObject("user", savedUser);
+            modelAndView.setViewName("signupSuccess");
+            return modelAndView;
+        } catch (Exception e) {
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while saving user: " + e.getMessage());
+            return errorModelAndView;
+        }
+    }
+
+    @GetMapping("/signupForm")
+    public ModelAndView showSignupForm() {
+        ModelAndView modelAndView = new ModelAndView("signupForm");
+        modelAndView.addObject("user", new User());
+        return modelAndView;
+    }
 
 
-        @PostMapping("/createauth")
+
+
+    @PostMapping("/createauth")
         public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
             /*try {*/
 
