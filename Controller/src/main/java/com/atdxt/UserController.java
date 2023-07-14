@@ -153,7 +153,7 @@ public class UserController {
 
     // create user
 
-//post method for form
+//post method for signUp form
     @PostMapping("/createuser")
     public ModelAndView saveUser(@ModelAttribute("user") User user) {
         try {
