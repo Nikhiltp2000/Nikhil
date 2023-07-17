@@ -45,66 +45,6 @@ public class UserController {
     }
 
     // Fetch all data from the database
-    /*@GetMapping("/getdata")
-    public ResponseEntity<List<User>> getAllUsers() {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }createuser
-    }*/
-
-
-
-
-
-  /*  @GetMapping("/getdata")
-    public String getAllUsers() {
-        try {
-            List<User> users = userService.getAcreateuserllUsers();
-            logger.info("Returned {} users", users.size());
-
-            StringBuilder table = new StringBuilder();
-            table.append("<table>")
-                    .append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Last Name</th><th>Role</th><th>street</th><th>city</th><th>country</th></tr>");
-
-            for (User user : users) {
-                table.append("<tr>")
-                        .append("<td>").append(user.getId()).append("</td>")
-                        .append("<td>").append(user.getName()).append("</td>")
-                        .append("<td>").append(user.getEmail()).append("</td>")
-                        .append("<td>").append(user.getLastname()).append("</td>")
-                        .append("<td>").append(user.getRole()).append("</td>")
-                        .append("<td>").append(user.getAddress().getStreet()).append("</td>")
-                        .append("<td>").append(user.getAddress().getCity()).append("</td>")
-                        .append("<td>").append(user.getAddress().getCountry()).append("</td>")
-                        .append("</tr>");
-            }
-            table.append("</table>");
-
-            return table.toString();
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return "Error occurred while fetching users";
-        }
-    }*/
-
-  /*  @GetMapping("/getdata")
-    public String getAllUsers(Model model) {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
-
-            model.addAttribute("users", users);
-            return "users";
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return "error";
-        }
-    }*/
 
     // Fetch all data from the database, Return values in tabular format
     @GetMapping("/getdata")
@@ -139,23 +79,6 @@ public class UserController {
 
 
     //get mapping to find user by id
-  /*  @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        try {
-            Optional<User> optionalUser = userService.getUserById(id);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                logger.info("Found user with ID: {}", id);
-                return ResponseEntity.ok(user);
-            } else {
-                logger.error("User with ID {} not found", id);
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching user with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }*/
 
 //get mapping to find user by id, Return values in tabular format
     @GetMapping("/users/{id}")
@@ -230,75 +153,16 @@ public class UserController {
         }
     }
 
-   /* @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        try {
-            Optional<User> optionalUser = userService.getUserById(id);
-            if (optionalUser.isPresent()) {
-                User existingUser = optionalUser.get();
 
-                // Update the properties of the existing user
-                if (updatedUser.getName() != null) {
-                    existingUser.setName(updatedUser.getName());
-                }
-                if (updatedUser.getEmail() != null) {
-                    existingUser.setEmail(updatedUser.getEmail());
-                }
-
-                User updatedUserResult = userService.saveUser(existingUser);
-                logger.info("Updated user with ID: {}", id);
-                return ResponseEntity.ok(updatedUserResult);
-            } else {
-                logger.warn("User with ID {} not found", id);
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            logger.error("Error occurred while updating user with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }*/
 
 
 
 
     // create user
-       /* @PostMapping("/createuser")
-        public ResponseEntity<Object> saveUser(@RequestBody User user) {
-            try {
-                if (!userService.isValidEmail(user.getEmail())) {
-                    String errorMessage = "Invalid email format!!,Please Enter valid email id";
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("ErrorMessage", errorMessage);
-                    errorResponse.put("Input Email", user.getEmail());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
-                if (userService.isNameExists(user.getName())) {
-                    String errorMessage = "Name already exists";
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("ErrorMessage", errorMessage);
-                    errorResponse.put("Input Name", user.getName());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
 
-                if (userService.isEmailExists(user.getEmail())) {
-                    String errorMessage = "Email already exists";
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("ErrorMessage", errorMessage);
-                    errorResponse.put("Input Email", user.getEmail());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
-
-                User savedUser = userService.saveUser(user,false);
-                logger.info("Saved user: {}", savedUser.getName());
-               return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-            } catch (Exception e) {
-                logger.error("Error occurred while saving user: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-       }*/
-//post method for form
+//post method for signUp form
     @PostMapping("/createuser")
-    public ModelAndView saveUser(@ModelAttribute("user") User user) {
+    public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
         try {
             ModelAndView modelAndView = new ModelAndView();
             if (!userService.isValidEmail(user.getEmail())) {
@@ -319,6 +183,37 @@ public class UserController {
                 modelAndView.setViewName("signupForm");
                 return modelAndView;
             }
+
+            // Check if the password and confirm password matches
+            if (!user.getAuth().getPassword().equals(confirmPassword)) {
+                String errorMessage = "Password and confirm password do not match.";
+                modelAndView.addObject("errorMessage", errorMessage);
+                modelAndView.setViewName("signupForm");
+                return modelAndView;
+            }
+
+            // Set the username and password in the Auth entity
+            Auth auth = new Auth();
+            auth.setUsername(user.getAuth().getUsername());
+           // auth.setPassword(user.getAuth().getPassword());
+          //  auth.encryptPassword();
+            // Encode the password in Base64
+            String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
+            auth.setPassword(encodedPassword);
+
+
+            // Set createdOn and modifiedOn dates
+            Date currentDate = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+            String currentDateTime = formatter.format(currentDate);
+            auth.setCreatedOn(currentDateTime);
+            auth.setModifiedOn(currentDateTime);
+
+            authRepository.save(auth);
+
+            // Set the Auth object in the User entity
+            user.setAuth(auth);
+
             User savedUser = userService.saveUser(user, false);
             modelAndView.addObject("user", savedUser);
             modelAndView.setViewName("signupSuccess");
@@ -361,15 +256,6 @@ public class UserController {
             return ResponseEntity.ok("User added successfully");
         }*/
 
-    /*    @GetMapping("/getauth")
-        public List<Auth> getUserData() {
-            List<Auth> userEncryptList = authRepository.findAll();
-            for (Auth userEntity3 : userEncryptList) {
-                userEntity3.decryptPassword();
-            }
-            logger.info("Fetching all users");
-            return userEncryptList;
-        }*/
 
     @GetMapping("/getauth")
     public ModelAndView getUserData() {
@@ -391,35 +277,19 @@ public class UserController {
         }
     }
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
     // Logout and redirect to the login page
     /*@GetMapping("/logout")
     public ModelAndView logout() {
         ModelAndView modelAndView = new ModelAndView("redirect:/login?logout");
         return modelAndView;
     }*/
+>>>>>>> master-v2.2.0
 
-    /*@PostMapping("/logout")
-    public String logout(HttpServletRequest request) throws ServletException {
-        request.logout();
-        return "redirect:/login?logout";
-    }*/
-
- /*   @GetMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        response.sendRedirect("/login?logout");
-    }*/
-
-    /*@GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        return "redirect:/getdata";
-    }
-*/
 }

@@ -27,6 +27,10 @@ public class User {
     @JsonIgnoreProperties("user")
     private Address address;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("user")
+    private Auth auth;
+
     private String modifiedOn;
     @Column(name = "created_on", updatable = false)
     private String createdOn;
@@ -94,6 +98,14 @@ public class User {
     public void setAddress(Address address) {
         this.address = address;
         address.setUser(this);
+    }
+
+    public Auth getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Auth auth) {
+        this.auth = auth;
     }
 
 //    public Timestamp getCreatedOn() {

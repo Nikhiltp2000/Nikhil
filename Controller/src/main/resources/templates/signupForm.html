@@ -92,6 +92,25 @@
       <input type="text" id="country" name="address.country" th:field="*{address.country}" required>
     </div>
 
+    <!-- Add the username field -->
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="user.auth.username" th:field="*{auth.username}" required>
+    </div>
+
+    <!-- Add the password field -->
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="user.auth.password" th:field="*{auth.password}" required>
+    </div>
+
+    <!-- Add the confirm password field -->
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+    </div>
+
+
     <div th:if="${errorMessage}" class="error-message">
       <p th:text="${errorMessage}"></p>
     </div>
@@ -99,6 +118,7 @@
     <div class="form-group">
       <button type="submit">Create User</button>
     </div>
+
   </form>
 </div>
 </body>

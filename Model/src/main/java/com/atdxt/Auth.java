@@ -27,6 +27,12 @@ public class Auth {
     @Column(name = "created_on", updatable = false)
     private String createdOn;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    @JsonBackReference
+    private User user;
+
     // Constructors, getters, and setters
 
     // Default constructor
@@ -82,9 +88,9 @@ public class Auth {
         this.createdOn = createdOn;
     }
 
-    public void encryptPassword() {
+   /* public void encryptPassword() {
         this.password = Base64.getEncoder().encodeToString(this.password.getBytes());
-    }
+    }*/
 
 
     public void decryptPassword() {

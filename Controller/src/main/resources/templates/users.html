@@ -6,6 +6,7 @@
     <style>
         table {
             border-collapse: collapse;
+            height: 100%;
             width: 100%;
         }
 
@@ -47,8 +48,11 @@
         <th>Email</th>
         <th>Last Name</th>
         <th>Role</th>
+        <th>Username</th>
+        <th>Password</th>
         <th>createdOn</th>
         <th>modifiedOn</th>
+
 
     </tr>
     <tr th:each="user : ${users}">
@@ -57,8 +61,12 @@
         <td th:text="${user.email}"></td>
         <td th:text="${user.lastname}"></td>
         <td th:text="${user.role}"></td>
+        <td th:text="${user.auth.username}"></td>
+        <td th:text="${user.auth.password}"></td>
         <td th:text="${user.createdOn}"></td>
         <td th:text="${user.modifiedOn}"></td>
+
+
     </tr>
 </table>
 <h1>Address List</h1>

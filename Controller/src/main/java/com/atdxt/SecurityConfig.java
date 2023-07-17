@@ -31,7 +31,6 @@ import org.springframework.security.core.userdetails.User.UserBuilder;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     public UserDetailsService userDetailsService() {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         UserDetails admin = User.builder()
