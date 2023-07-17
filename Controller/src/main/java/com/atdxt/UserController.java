@@ -113,6 +113,13 @@ public class UserController {
             List<User> users = userService.getAllUsers();
             logger.info("Returned {} users", users.size());
 
+            // Decrypt the passwords
+            for (User user : users) {
+                Auth auth = user.getAuth();
+                String decodedPassword = new String(Base64.getDecoder().decode(auth.getPassword()));
+                auth.setPassword(decodedPassword);
+            }
+
             ModelAndView modelAndView = new ModelAndView("users");
             modelAndView.addObject("users", users);
             return modelAndView;
@@ -291,7 +298,7 @@ public class UserController {
        }*/
 //post method for form
     @PostMapping("/createuser")
-    public ModelAndView saveUser(@ModelAttribute("user") User user) {
+    public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
         try {
             ModelAndView modelAndView = new ModelAndView();
             if (!userService.isValidEmail(user.getEmail())) {
@@ -312,6 +319,37 @@ public class UserController {
                 modelAndView.setViewName("signupForm");
                 return modelAndView;
             }
+
+            // Check if the password and confirm password matches
+            if (!user.getAuth().getPassword().equals(confirmPassword)) {
+                String errorMessage = "Password and confirm password do not match.";
+                modelAndView.addObject("errorMessage", errorMessage);
+                modelAndView.setViewName("signupForm");
+                return modelAndView;
+            }
+
+            // Set the username and password in the Auth entity
+            Auth auth = new Auth();
+            auth.setUsername(user.getAuth().getUsername());
+           // auth.setPassword(user.getAuth().getPassword());
+          //  auth.encryptPassword();
+            // Encode the password in Base64
+            String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
+            auth.setPassword(encodedPassword);
+
+
+            // Set createdOn and modifiedOn dates
+            Date currentDate = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+            String currentDateTime = formatter.format(currentDate);
+            auth.setCreatedOn(currentDateTime);
+            auth.setModifiedOn(currentDateTime);
+
+            authRepository.save(auth);
+
+            // Set the Auth object in the User entity
+            user.setAuth(auth);
+
             User savedUser = userService.saveUser(user, false);
             modelAndView.addObject("user", savedUser);
             modelAndView.setViewName("signupSuccess");
@@ -332,10 +370,10 @@ public class UserController {
 
 
 
-
-    @PostMapping("/createauth")
+// create username and password (commented for now as username and password is now storing through the signUp form)
+  /*  @PostMapping("/createauth")
         public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
-            /*try {*/
+            *//*try {*//*
 
             Auth userEncrypt1 = new Auth();
             userEncrypt1.setUsername(userEntity3.getUsername());
@@ -352,7 +390,7 @@ public class UserController {
             logger.info("User added successfully");
             //    logger.info("Saved user: {}", savedUser.getName());
             return ResponseEntity.ok("User added successfully");
-        }
+        }*/
 
     /*    @GetMapping("/getauth")
         public List<Auth> getUserData() {
@@ -383,6 +421,11 @@ public class UserController {
             return errorModelAndView;
         }
     }
+
+
+
+
+
 
     // Logout and redirect to the login page
     /*@GetMapping("/logout")
