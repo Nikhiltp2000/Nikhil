@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,67 +45,7 @@ public class UserController {
         this.authRepository = authRepository;
     }
 
-    // Fetch all data from the database
-    /*@GetMapping("/getdata")
-    public ResponseEntity<List<User>> getAllUsers() {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }createuser
-    }*/
 
-
-
-
-
-  /*  @GetMapping("/getdata")
-    public String getAllUsers() {
-        try {
-            List<User> users = userService.getAcreateuserllUsers();
-            logger.info("Returned {} users", users.size());
-
-            StringBuilder table = new StringBuilder();
-            table.append("<table>")
-                    .append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Last Name</th><th>Role</th><th>street</th><th>city</th><th>country</th></tr>");
-
-            for (User user : users) {
-                table.append("<tr>")
-                        .append("<td>").append(user.getId()).append("</td>")
-                        .append("<td>").append(user.getName()).append("</td>")
-                        .append("<td>").append(user.getEmail()).append("</td>")
-                        .append("<td>").append(user.getLastname()).append("</td>")
-                        .append("<td>").append(user.getRole()).append("</td>")
-                        .append("<td>").append(user.getAddress().getStreet()).append("</td>")
-                        .append("<td>").append(user.getAddress().getCity()).append("</td>")
-                        .append("<td>").append(user.getAddress().getCountry()).append("</td>")
-                        .append("</tr>");
-            }
-            table.append("</table>");
-
-            return table.toString();
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return "Error occurred while fetching users";
-        }
-    }*/
-
-  /*  @GetMapping("/getdata")
-    public String getAllUsers(Model model) {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
-
-            model.addAttribute("users", users);
-            return "users";
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return "error";
-        }
-    }*/
 
     // Fetch all data from the database, Return values in tabular format
     @GetMapping("/getdata")
@@ -114,11 +55,11 @@ public class UserController {
             logger.info("Returned {} users", users.size());
 
             // Decrypt the passwords
-            for (User user : users) {
+           /* for (User user : users) {
                 Auth auth = user.getAuth();
                 String decodedPassword = new String(Base64.getDecoder().decode(auth.getPassword()));
                 auth.setPassword(decodedPassword);
-            }
+            }*/
 
             ModelAndView modelAndView = new ModelAndView("users");
             modelAndView.addObject("users", users);
@@ -130,6 +71,14 @@ public class UserController {
             return errorModelAndView;
         }
     }
+
+
+
+
+
+
+
+
 
     @GetMapping("/")
     public ModelAndView homePage() {
@@ -296,7 +245,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
        }*/
-//post method for form
+//post method for form (create user)
     @PostMapping("/createuser")
     public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
         try {
@@ -331,11 +280,16 @@ public class UserController {
             // Set the username and password in the Auth entity
             Auth auth = new Auth();
             auth.setUsername(user.getAuth().getUsername());
-           // auth.setPassword(user.getAuth().getPassword());
-          //  auth.encryptPassword();
+            auth.setPassword(user.getAuth().getPassword());
+            auth.encryptPassword();
+
+            // Encode the password using BCryptPasswordEncoder
+           /* String encodedPassword = passwordEncoder.encode(user.getAuth().getPassword());
+            auth.setPassword(encodedPassword);*/
+
             // Encode the password in Base64
-            String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
-            auth.setPassword(encodedPassword);
+           /* String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
+            auth.setPassword(encodedPassword);*/
 
 
             // Set createdOn and modifiedOn dates
@@ -423,39 +377,4 @@ public class UserController {
     }
 
 
-
-
-
-
-    // Logout and redirect to the login page
-    /*@GetMapping("/logout")
-    public ModelAndView logout() {
-        ModelAndView modelAndView = new ModelAndView("redirect:/login?logout");
-        return modelAndView;
-    }*/
-
-    /*@PostMapping("/logout")
-    public String logout(HttpServletRequest request) throws ServletException {
-        request.logout();
-        return "redirect:/login?logout";
-    }*/
-
- /*   @GetMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        response.sendRedirect("/login?logout");
-    }*/
-
-    /*@GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        return "redirect:/getdata";
-    }
-*/
 }
