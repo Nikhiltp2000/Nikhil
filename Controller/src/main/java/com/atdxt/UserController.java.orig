@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,10 +46,9 @@ public class UserController {
         this.authRepository = authRepository;
     }
 
-    // Fetch all data from the database
 
     // Fetch all data from the database, Return values in tabular format
-    @GetMapping("/getdata")
+  /*  @GetMapping("/getdata")
     public ModelAndView getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
@@ -70,6 +71,52 @@ public class UserController {
             return errorModelAndView;
         }
     }
+*/
+
+
+    @GetMapping("/getdata")
+    public ModelAndView getAllUsers(ModelAndView model, Principal principal) {
+        try {
+            logger.info("Fetching all users");
+            String username = principal.getName();
+
+            if (username.equals("Admin")) {
+                List<User> users = userService.getAllUsers();
+
+                model.setViewName("users");
+                model.addObject("users", users);
+                return model;
+            } else {
+
+                Auth auth = userService.getUserByUsername(username);
+
+                if (auth != null) {
+                    List<User> users = new ArrayList<>();
+                    users.add(auth.getUser());  // Access the associated User object using getUser()
+                    model.setViewName("users");
+                    model.addObject("users", users);
+                    return model;
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while fetching users");
+            return errorModelAndView;
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
 
     @GetMapping("/")
     public ModelAndView homePage() {
@@ -79,6 +126,23 @@ public class UserController {
 
 
     //get mapping to find user by id
+  /*  @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        try {
+            Optional<User> optionalUser = userService.getUserById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                logger.info("Found user with ID: {}", id);
+                return ResponseEntity.ok(user);
+            } else {
+                logger.error("User with ID {} not found", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching user with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }*/
 
 //get mapping to find user by id, Return values in tabular format
     @GetMapping("/users/{id}")
@@ -153,16 +217,75 @@ public class UserController {
         }
     }
 
+   /* @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        try {
+            Optional<User> optionalUser = userService.getUserById(id);
+            if (optionalUser.isPresent()) {
+                User existingUser = optionalUser.get();
 
+                // Update the properties of the existing user
+                if (updatedUser.getName() != null) {
+                    existingUser.setName(updatedUser.getName());
+                }
+                if (updatedUser.getEmail() != null) {
+                    existingUser.setEmail(updatedUser.getEmail());
+                }
+
+                User updatedUserResult = userService.saveUser(existingUser);
+                logger.info("Updated user with ID: {}", id);
+                return ResponseEntity.ok(updatedUserResult);
+            } else {
+                logger.warn("User with ID {} not found", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while updating user with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }*/
 
 
 
 
     // create user
+       /* @PostMapping("/createuser")
+        public ResponseEntity<Object> saveUser(@RequestBody User user) {
+            try {
+                if (!userService.isValidEmail(user.getEmail())) {
+                    String errorMessage = "Invalid email format!!,Please Enter valid email id";
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("ErrorMessage", errorMessage);
+                    errorResponse.put("Input Email", user.getEmail());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
+                if (userService.isNameExists(user.getName())) {
+                    String errorMessage = "Name already exists";
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("ErrorMessage", errorMessage);
+                    errorResponse.put("Input Name", user.getName());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
 
-//post method for signUp form
+                if (userService.isEmailExists(user.getEmail())) {
+                    String errorMessage = "Email already exists";
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("ErrorMessage", errorMessage);
+                    errorResponse.put("Input Email", user.getEmail());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
+
+                User savedUser = userService.saveUser(user,false);
+                logger.info("Saved user: {}", savedUser.getName());
+               return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+            } catch (Exception e) {
+                logger.error("Error occurred while saving user: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+       }*/
+//post method for form (create user)
     @PostMapping("/createuser")
-    public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
+    public ModelAndView saveUser(@ModelAttribute("user") User user) {
         try {
             ModelAndView modelAndView = new ModelAndView();
             if (!userService.isValidEmail(user.getEmail())) {
@@ -183,6 +306,8 @@ public class UserController {
                 modelAndView.setViewName("signupForm");
                 return modelAndView;
             }
+<<<<<<< HEAD
+=======
 
             // Check if the password and confirm password matches
             if (!user.getAuth().getPassword().equals(confirmPassword)) {
@@ -195,11 +320,16 @@ public class UserController {
             // Set the username and password in the Auth entity
             Auth auth = new Auth();
             auth.setUsername(user.getAuth().getUsername());
-           // auth.setPassword(user.getAuth().getPassword());
-          //  auth.encryptPassword();
+            auth.setPassword(user.getAuth().getPassword());
+            auth.encryptPassword();
+
+            // Encode the password using BCryptPasswordEncoder
+           /* String encodedPassword = passwordEncoder.encode(user.getAuth().getPassword());
+            auth.setPassword(encodedPassword);*/
+
             // Encode the password in Base64
-            String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
-            auth.setPassword(encodedPassword);
+           /* String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
+            auth.setPassword(encodedPassword);*/
 
 
             // Set createdOn and modifiedOn dates
@@ -214,6 +344,7 @@ public class UserController {
             // Set the Auth object in the User entity
             user.setAuth(auth);
 
+>>>>>>> master-v2.2.0
             User savedUser = userService.saveUser(user, false);
             modelAndView.addObject("user", savedUser);
             modelAndView.setViewName("signupSuccess");
@@ -256,6 +387,15 @@ public class UserController {
             return ResponseEntity.ok("User added successfully");
         }*/
 
+    /*    @GetMapping("/getauth")
+        public List<Auth> getUserData() {
+            List<Auth> userEncryptList = authRepository.findAll();
+            for (Auth userEntity3 : userEncryptList) {
+                userEntity3.decryptPassword();
+            }
+            logger.info("Fetching all users");
+            return userEncryptList;
+        }*/
 
     @GetMapping("/getauth")
     public ModelAndView getUserData() {
@@ -278,18 +418,38 @@ public class UserController {
     }
 
 <<<<<<< HEAD
-=======
-
-
-
-
-
     // Logout and redirect to the login page
     /*@GetMapping("/logout")
     public ModelAndView logout() {
         ModelAndView modelAndView = new ModelAndView("redirect:/login?logout");
         return modelAndView;
     }*/
->>>>>>> master-v2.2.0
 
+    /*@PostMapping("/logout")
+    public String logout(HttpServletRequest request) throws ServletException {
+        request.logout();
+        return "redirect:/login?logout";
+    }*/
+
+ /*   @GetMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        response.sendRedirect("/login?logout");
+    }*/
+
+    /*@GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        return "redirect:/getdata";
+    }
+*/
+=======
+
+>>>>>>> master-v2.2.0
 }

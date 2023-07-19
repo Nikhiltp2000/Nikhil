@@ -2,6 +2,8 @@ package com.atdxt;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -87,17 +89,27 @@ public class Auth {
     public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
+    public User getUser() {
+        return user;
+    }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
    /* public void encryptPassword() {
         this.password = Base64.getEncoder().encodeToString(this.password.getBytes());
     }*/
 
 
+    //Encrypt the password using bcrypt
+    public void encryptPassword() {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        this.password = passwordEncoder.encode(this.password);}
+
+    //Decrypt the password (commenting for now, because of base64)
     public void decryptPassword() {
         this.password = new String(Base64.getDecoder().decode(this.password));
     }
-
-
 
 
 }

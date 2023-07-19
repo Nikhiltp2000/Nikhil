@@ -298,7 +298,7 @@ public class UserController {
        }*/
 //post method for form
     @PostMapping("/createuser")
-    public ModelAndView saveUser(@ModelAttribute("user") User user) {
+    public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
         try {
             ModelAndView modelAndView = new ModelAndView();
             if (!userService.isValidEmail(user.getEmail())) {
@@ -319,6 +319,42 @@ public class UserController {
                 modelAndView.setViewName("signupForm");
                 return modelAndView;
             }
+
+            // Check if the password and confirm password matches
+            if (!user.getAuth().getPassword().equals(confirmPassword)) {
+                String errorMessage = "Password and confirm password do not match.";
+                modelAndView.addObject("errorMessage", errorMessage);
+                modelAndView.setViewName("signupForm");
+                return modelAndView;
+            }
+
+            // Set the username and password in the Auth entity
+            Auth auth = new Auth();
+            auth.setUsername(user.getAuth().getUsername());
+            auth.setPassword(user.getAuth().getPassword());
+            auth.encryptPassword();
+
+            // Encode the password using BCryptPasswordEncoder
+           /* String encodedPassword = passwordEncoder.encode(user.getAuth().getPassword());
+            auth.setPassword(encodedPassword);*/
+
+            // Encode the password in Base64
+           /* String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
+            auth.setPassword(encodedPassword);*/
+
+
+            // Set createdOn and modifiedOn dates
+            Date currentDate = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+            String currentDateTime = formatter.format(currentDate);
+            auth.setCreatedOn(currentDateTime);
+            auth.setModifiedOn(currentDateTime);
+
+            authRepository.save(auth);
+
+            // Set the Auth object in the User entity
+            user.setAuth(auth);
+
             User savedUser = userService.saveUser(user, false);
             modelAndView.addObject("user", savedUser);
             modelAndView.setViewName("signupSuccess");
@@ -391,35 +427,5 @@ public class UserController {
         }
     }
 
-    // Logout and redirect to the login page
-    /*@GetMapping("/logout")
-    public ModelAndView logout() {
-        ModelAndView modelAndView = new ModelAndView("redirect:/login?logout");
-        return modelAndView;
-    }*/
 
-    /*@PostMapping("/logout")
-    public String logout(HttpServletRequest request) throws ServletException {
-        request.logout();
-        return "redirect:/login?logout";
-    }*/
-
- /*   @GetMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        response.sendRedirect("/login?logout");
-    }*/
-
-    /*@GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        return "redirect:/getdata";
-    }
-*/
 }
