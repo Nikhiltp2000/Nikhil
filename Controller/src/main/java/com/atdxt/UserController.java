@@ -125,24 +125,7 @@ public class UserController {
     }
 
 
-    //get mapping to find user by id
-  /*  @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        try {
-            Optional<User> optionalUser = userService.getUserById(id);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                logger.info("Found user with ID: {}", id);
-                return ResponseEntity.ok(user);
-            } else {
-                logger.error("User with ID {} not found", id);
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching user with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }*/
+
 
 //get mapping to find user by id, Return values in tabular format
     @GetMapping("/users/{id}")
