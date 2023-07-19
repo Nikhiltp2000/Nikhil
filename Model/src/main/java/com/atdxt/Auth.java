@@ -89,7 +89,13 @@ public class Auth {
     public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
+    public User getUser() {
+        return user;
+    }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
    /* public void encryptPassword() {
         this.password = Base64.getEncoder().encodeToString(this.password.getBytes());
     }*/
@@ -104,6 +110,7 @@ public class Auth {
     public void decryptPassword() {
         this.password = new String(Base64.getDecoder().decode(this.password));
     }
+
 
 }
 

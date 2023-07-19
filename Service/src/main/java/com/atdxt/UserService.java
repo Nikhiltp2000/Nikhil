@@ -153,4 +153,14 @@ public class UserService {
     }
 
 
+    public Auth getUserByUsername(String username) {
+        //System.out.println("Getting user details for username: " + username);
+
+        System.out.println("User details retrieved: " + authRepository.findByUsername(username)
+                .orElse(null));
+        return authRepository.findByUsername(username)
+                .orElse(null);
+    }
+
+
 }

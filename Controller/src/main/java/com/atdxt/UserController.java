@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -46,20 +47,19 @@ public class UserController {
     }
 
 
-
     // Fetch all data from the database, Return values in tabular format
-    @GetMapping("/getdata")
+  /*  @GetMapping("/getdata")
     public ModelAndView getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
             logger.info("Returned {} users", users.size());
 
             // Decrypt the passwords
-           /* for (User user : users) {
+            for (User user : users) {
                 Auth auth = user.getAuth();
                 String decodedPassword = new String(Base64.getDecoder().decode(auth.getPassword()));
                 auth.setPassword(decodedPassword);
-            }*/
+            }
 
             ModelAndView modelAndView = new ModelAndView("users");
             modelAndView.addObject("users", users);
@@ -71,6 +71,44 @@ public class UserController {
             return errorModelAndView;
         }
     }
+*/
+
+
+    @GetMapping("/getdata")
+    public ModelAndView getAllUsers(ModelAndView model, Principal principal) {
+        try {
+            logger.info("Fetching all users");
+            String username = principal.getName();
+
+            if (username.equals("Admin")) {
+                List<User> users = userService.getAllUsers();
+
+                model.setViewName("users");
+                model.addObject("users", users);
+                return model;
+            } else {
+
+                Auth auth = userService.getUserByUsername(username);
+
+                if (auth != null) {
+                    List<User> users = new ArrayList<>();
+                    users.add(auth.getUser());  // Access the associated User object using getUser()
+                    model.setViewName("users");
+                    model.addObject("users", users);
+                    return model;
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while fetching users");
+            return errorModelAndView;
+        }
+        return null;
+    }
+
+
 
 
 
