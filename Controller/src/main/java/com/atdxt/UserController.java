@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,70 +46,9 @@ public class UserController {
         this.authRepository = authRepository;
     }
 
-    // Fetch all data from the database
-    /*@GetMapping("/getdata")
-    public ResponseEntity<List<User>> getAllUsers() {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }createuser
-    }*/
-
-
-
-
-
-  /*  @GetMapping("/getdata")
-    public String getAllUsers() {
-        try {
-            List<User> users = userService.getAcreateuserllUsers();
-            logger.info("Returned {} users", users.size());
-
-            StringBuilder table = new StringBuilder();
-            table.append("<table>")
-                    .append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Last Name</th><th>Role</th><th>street</th><th>city</th><th>country</th></tr>");
-
-            for (User user : users) {
-                table.append("<tr>")
-                        .append("<td>").append(user.getId()).append("</td>")
-                        .append("<td>").append(user.getName()).append("</td>")
-                        .append("<td>").append(user.getEmail()).append("</td>")
-                        .append("<td>").append(user.getLastname()).append("</td>")
-                        .append("<td>").append(user.getRole()).append("</td>")
-                        .append("<td>").append(user.getAddress().getStreet()).append("</td>")
-                        .append("<td>").append(user.getAddress().getCity()).append("</td>")
-                        .append("<td>").append(user.getAddress().getCountry()).append("</td>")
-                        .append("</tr>");
-            }
-            table.append("</table>");
-
-            return table.toString();
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return "Error occurred while fetching users";
-        }
-    }*/
-
-  /*  @GetMapping("/getdata")
-    public String getAllUsers(Model model) {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
-
-            model.addAttribute("users", users);
-            return "users";
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            return "error";
-        }
-    }*/
 
     // Fetch all data from the database, Return values in tabular format
-    @GetMapping("/getdata")
+  /*  @GetMapping("/getdata")
     public ModelAndView getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
@@ -130,6 +71,52 @@ public class UserController {
             return errorModelAndView;
         }
     }
+*/
+
+
+    @GetMapping("/getdata")
+    public ModelAndView getAllUsers(ModelAndView model, Principal principal) {
+        try {
+            logger.info("Fetching all users");
+            String username = principal.getName();
+
+            if (username.equals("Admin")) {
+                List<User> users = userService.getAllUsers();
+
+                model.setViewName("users");
+                model.addObject("users", users);
+                return model;
+            } else {
+
+                Auth auth = userService.getUserByUsername(username);
+
+                if (auth != null) {
+                    List<User> users = new ArrayList<>();
+                    users.add(auth.getUser());  // Access the associated User object using getUser()
+                    model.setViewName("users");
+                    model.addObject("users", users);
+                    return model;
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching users: {}", e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred while fetching users");
+            return errorModelAndView;
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
 
     @GetMapping("/")
     public ModelAndView homePage() {
@@ -140,7 +127,7 @@ public class UserController {
 
 
 
-//get mapping to find user by id, Return values in tabular format
+    //get mapping to find user by id, Return values in tabular format
     @GetMapping("/users/{id}")
     public ModelAndView getUserById(@PathVariable Long id) {
         try {
@@ -279,7 +266,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
        }*/
-//post method for form
+//post method for form (create user)
     @PostMapping("/createuser")
     public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
         try {
