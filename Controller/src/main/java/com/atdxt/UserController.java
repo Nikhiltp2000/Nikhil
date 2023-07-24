@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -158,7 +159,7 @@ public class UserController {
 
     // update the user value by Id
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser,@RequestParam("image") MultipartFile image) {
         try {
             Optional<User> optionalUser = userService.getUserById(id);
             if (optionalUser.isPresent()) {
@@ -187,7 +188,7 @@ public class UserController {
                     existingAddress.setCountry(updatedAddress.getCountry());
                 }
 
-                User updatedUserResult = userService.saveUser(existingUser,true);
+                User updatedUserResult = userService.saveUser(existingUser,true,image);
                 logger.info("Updated user with ID: {}", id);
                 return ResponseEntity.ok(updatedUserResult);
             } else {
@@ -268,7 +269,7 @@ public class UserController {
        }*/
 //post method for form (create user)
     @PostMapping("/createuser")
-    public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword) {
+    public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword, @RequestParam("image") MultipartFile image) {
         try {
             ModelAndView modelAndView = new ModelAndView();
             if (!userService.isValidEmail(user.getEmail())) {
@@ -325,7 +326,15 @@ public class UserController {
             // Set the Auth object in the User entity
             user.setAuth(auth);
 
-            User savedUser = userService.saveUser(user, false);
+
+            // Check if an image file is uploaded
+            if (!image.isEmpty()) {
+                // Save the image to AWS S3 and get the image URL
+                String imageUrl = userService.uploadImageToS3(image);
+                user.setImg_url(imageUrl);
+            }
+
+            User savedUser = userService.saveUser(user, false,image);
             modelAndView.addObject("user", savedUser);
             modelAndView.setViewName("signupSuccess");
             return modelAndView;

@@ -21,6 +21,9 @@ public class User {
 
     private String role;
 
+    @Column(name = "img_url")
+    private String img_url;
+
 
 //    @JsonIgnoreProperties("user")
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY )
@@ -48,12 +51,13 @@ public class User {
     }
 
     // Constructor
-    public User(Long id, String name, String email,String lastname,String role) {
+    public User(Long id, String name, String email,String lastname,String role,String img_url) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.lastname=lastname;
         this.role=role;
+        this.img_url=img_url;
     }
 
     // Getters and Setters
@@ -89,6 +93,23 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+
+    /*public void setImgUrl(String img_url){
+        this.img_url=img_url;
+    }*/
+
+    public void setImg_url(String img_url) {
+        this.img_url = img_url;
+    }
+
+    /*public String getImgUrl(){
+        return img_url;
+    }*/
+
+    public String getImg_url() {
+        return img_url;
     }
 
     public Address getAddress() {

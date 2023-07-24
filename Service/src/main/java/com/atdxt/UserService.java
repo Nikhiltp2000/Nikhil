@@ -4,21 +4,36 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Pattern;
+
+
+
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+
+
 
 @Service
 public class UserService {
@@ -30,12 +45,21 @@ public class UserService {
 
     private final AuthRepository authRepository;
 
+    private final S3Client s3Client;
+
+//    private final String awsS3BucketName;
+
+
+
 
     @Autowired
-    public UserService(UserRepository userRepository, AddressRepository addressRepository, AuthRepository authRepository) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository, AuthRepository authRepository,S3Client s3Client) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.authRepository= authRepository;
+        this.s3Client = s3Client;
+//        this.awsS3BucketName = awsS3BucketName;
+
     }
     //Get all users
     public List<User> getAllUsers() {
@@ -79,7 +103,7 @@ public class UserService {
         return userRepository.save(user);
     }*/
 //Save user
-    public User saveUser(User user, boolean isUpdate) {
+    public User saveUser(User user, boolean isUpdate,MultipartFile image) throws IOException  {
         logger.info("Saving user: {}", user.getName());
         user.setCreatedOn(formatDate(new Date()));
         user.setModifiedOn(formatDate(new Date()));
@@ -95,14 +119,20 @@ public class UserService {
         if (user.getAddress() != null && user.getAddress().getStreet() != null &&
                 user.getAddress().getCity() != null && user.getAddress().getCountry() != null) {
             // Save user with new columns
-            return saveUserWithNewColumns(user);
+            return saveUserWithNewColumns(user,image);
         } else {
             // Save user without new columns
-            return saveUserWithoutNewColumns(user);
+            return saveUserWithoutNewColumns(user,image);
         }
     }
 
-    private User saveUserWithNewColumns(User user) {
+    private User saveUserWithNewColumns(User user,MultipartFile image)throws IOException {
+
+        // Upload image to AWS S3 and get the image URL
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = uploadImageToS3(image);
+            user.setImg_url(imageUrl);
+        }
         if (user.getAddress() != null) {
             Address address = user.getAddress();
             address.setUser(user);
@@ -116,7 +146,13 @@ public class UserService {
         }
         return userRepository.save(user);
     }
-    private User saveUserWithoutNewColumns(User user) {
+    private User saveUserWithoutNewColumns(User user,MultipartFile image)throws IOException {
+
+        // Upload image to AWS S3 and get the image URL
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = uploadImageToS3(image);
+            user.setImg_url(imageUrl);
+        }
         if (user.getAddress() != null) {
             Address address = user.getAddress();
             address.setUser(user);
@@ -161,6 +197,57 @@ public class UserService {
         return authRepository.findByUsername(username)
                 .orElse(null);
     }
+
+
+
+
+   /* public String uploadImageToS3(MultipartFile image) throws IOException {
+        try {
+            String key = "images/" + UUID.randomUUID().toString() + "-" + image.getOriginalFilename();
+            PutObjectRequest putObjectRequest = new PutObjectRequest(awsS3BucketName, key, image.getInputStream(), new ObjectMetadata());
+            putObjectRequest.setCannedAcl(ObjectCannedACL.PUBLIC_READ);
+            s3Client.putObject(putObjectRequest);
+
+            return "https://" + awsS3BucketName + ".s3.amazonaws.com/" + key;
+        } catch (S3Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }*/
+
+    @Value("${aws.Bucket}")
+    private String awsS3BucketName;
+
+    public String uploadImageToS3(MultipartFile image) throws IOException {
+        try {
+            String key = "images/" + image.getOriginalFilename();
+            //String awsS3BucketName = "dev-bucket-2924";
+           // String awsS3BucketName = "prod-bucket-2924";
+
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(awsS3BucketName)
+                    .key(key)
+                    .contentType(image.getContentType())
+                    .acl(ObjectCannedACL.PUBLIC_READ)
+                    .build();
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(image.getInputStream(), image.getSize()));
+
+            return "https://"+awsS3BucketName+".s3.amazonaws.com/" + key;
+        } catch (S3Exception e) {
+            e.printStackTrace();
+            // Handle the exception accordingly
+            throw e;
+        }
+    }
+
+  
+
+
+
+
+
+
+
 
 
 }
