@@ -130,6 +130,7 @@ public class UserService {
 
         // Upload image to AWS S3 and get the image URL
         if (image != null && !image.isEmpty()) {
+            logger.info("Image is present. Uploading image to S3...");
             String imageUrl = uploadImageToS3(image);
             user.setImg_url(imageUrl);
         }
@@ -150,6 +151,7 @@ public class UserService {
 
         // Upload image to AWS S3 and get the image URL
         if (image != null && !image.isEmpty()) {
+            logger.info("Image is present. Uploading image to S3...");
             String imageUrl = uploadImageToS3(image);
             user.setImg_url(imageUrl);
         }

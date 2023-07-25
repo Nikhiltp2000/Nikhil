@@ -332,6 +332,7 @@ public class UserController {
                 // Save the image to AWS S3 and get the image URL
                 String imageUrl = userService.uploadImageToS3(image);
                 user.setImg_url(imageUrl);
+                logger.info("Image saved to s3 URL = {}",imageUrl);
             }
 
             User savedUser = userService.saveUser(user, false,image);
