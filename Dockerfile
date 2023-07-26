@@ -2,6 +2,9 @@ FROM openjdk:17-alpine
 
 WORKDIR /app
 
+
+ENV SPRING_PROFILES_ACTIVE=prod
+
 # JAR file into the container
 COPY Controller/target/Controller-0.0.1-SNAPSHOT.war /app/spring-boot.war
 

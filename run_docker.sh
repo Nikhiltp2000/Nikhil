@@ -39,8 +39,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-
-
 # Stop and remove the existing container if it exists
 docker stop app-container 2>/dev/null
 docker rm app-container 2>/dev/null

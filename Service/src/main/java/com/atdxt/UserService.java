@@ -130,9 +130,11 @@ public class UserService {
 
         // Upload image to AWS S3 and get the image URL
         if (image != null && !image.isEmpty()) {
-            logger.info("Image is present. Uploading image to S3...");
+            logger.info("Image is present!!. Uploading image to S3..."+image);
             String imageUrl = uploadImageToS3(image);
+            System.out.println("Image url"+imageUrl);
             user.setImg_url(imageUrl);
+            logger.info("image url log"+imageUrl);
         }
         if (user.getAddress() != null) {
             Address address = user.getAddress();
@@ -151,7 +153,7 @@ public class UserService {
 
         // Upload image to AWS S3 and get the image URL
         if (image != null && !image.isEmpty()) {
-            logger.info("Image is present. Uploading image to S3...");
+            logger.info("Image is present. Uploading image to S3..."+ image);
             String imageUrl = uploadImageToS3(image);
             user.setImg_url(imageUrl);
         }
@@ -216,6 +218,18 @@ public class UserService {
             throw e;
         }
     }*/
+
+    @Value("${aws.accessKeyId}")
+    private String awsAccessKeyId;
+    {
+        System.out.println(awsAccessKeyId);
+    }
+
+    @Value("${aws.secretKey}")
+    private String awsSecretKey;
+
+    @Value("${aws.region}")
+    private String awsRegion;
 
     @Value("${aws.Bucket}")
     private String awsS3BucketName;
