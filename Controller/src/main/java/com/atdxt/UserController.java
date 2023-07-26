@@ -335,6 +335,7 @@ public class UserController {
                 logger.info("Image saved to s3 URL = {}",imageUrl);
             }*/
 
+
             User savedUser = userService.saveUser(user, false,image);
             modelAndView.addObject("user", savedUser);
             modelAndView.setViewName("signupSuccess");

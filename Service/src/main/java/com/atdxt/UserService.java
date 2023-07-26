@@ -237,6 +237,7 @@ public class UserService {
     public String uploadImageToS3(MultipartFile image) throws IOException {
         try {
             String key = "images/" + image.getOriginalFilename();
+            System.out.println("key : " +key);
             //String awsS3BucketName = "dev-bucket-2924";
            // String awsS3BucketName = "prod-bucket-2924";
 
