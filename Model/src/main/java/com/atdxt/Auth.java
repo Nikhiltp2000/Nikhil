@@ -31,7 +31,7 @@ public class Auth {
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 

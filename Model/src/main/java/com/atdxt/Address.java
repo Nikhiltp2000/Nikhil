@@ -20,7 +20,7 @@ public class Address {
     private String createdOn;
 
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 

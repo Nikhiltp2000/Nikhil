@@ -98,6 +98,18 @@ public class UserController {
                     model.addObject("users", users);
                     return model;
                 }
+
+               /* if (auth != null && auth.getUser() != null && auth.getUsername() != null) {
+                    // Ensure that the Auth object, User object, and username are not null
+                    List<User> users = new ArrayList<>();
+                    users.add(auth.getUser()); // Add the user associated with the Auth object to the list
+
+                    model.setViewName("users");
+                    model.addObject("users", users);
+                    return model;
+                }*/
+
+
             }
 
         } catch (Exception e) {
@@ -299,6 +311,8 @@ public class UserController {
                 return modelAndView;
             }
 
+
+
             // Set the username and password in the Auth entity
             Auth auth = new Auth();
             auth.setUsername(user.getAuth().getUsername());
@@ -325,15 +339,18 @@ public class UserController {
 
             // Set the Auth object in the User entity
             user.setAuth(auth);
+            auth.setUser(user);
 
 
             // Check if an image file is uploaded
-           /* if (!image.isEmpty()) {
+            if (!image.isEmpty()) {
+                logger.info("Image is present!!. Uploading image to S3..."+image);
                 // Save the image to AWS S3 and get the image URL
                 String imageUrl = userService.uploadImageToS3(image);
+                System.out.println("Image url"+imageUrl);
                 user.setImg_url(imageUrl);
                 logger.info("Image saved to s3 URL = {}",imageUrl);
-            }*/
+            }
 
 
             User savedUser = userService.saveUser(user, false,image);
