@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 //import java.time.Instant;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
@@ -59,6 +61,8 @@ public class User {
         this.role=role;
         this.img_url=img_url;
     }
+
+
 
     // Getters and Setters
     public Long getId() {

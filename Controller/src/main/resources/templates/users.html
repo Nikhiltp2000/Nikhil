@@ -68,8 +68,8 @@
                  alt="User Image" class="user-image" >
         </td>
 
-        <td th:text="${user.auth.username}"></td>
-        <td th:text="${user.auth.password}"></td>
+        <td th:text="${user.auth?.username}"></td>
+        <td th:text="${user.auth?.password}"></td>
         <td th:text="${user.createdOn}"></td>
         <td th:text="${user.modifiedOn}"></td>
 
@@ -81,6 +81,7 @@
 <table>
     <tr>
         <th>ID</th>
+        <th>User ID</th>
         <th>Street</th>
         <th>City</th>
         <th>Country</th>
@@ -88,12 +89,13 @@
         <th>modifiedOn</th>
     </tr>
     <tr th:each="user : ${users}">
-        <td th:text="${user.address.id}"></td>
-        <td th:text="${user.address.street}"></td>
-        <td th:text="${user.address.city}"></td>
-        <td th:text="${user.address.country}"></td>
-        <td th:text="${user.address.createdOn}"></td>
-        <td th:text="${user.address.modifiedOn}"></td>
+        <td th:text="${user.address?.id}"></td>
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.address?.street}"></td>
+        <td th:text="${user.address?.city}"></td>
+        <td th:text="${user.address?.country}"></td>
+        <td th:text="${user.address?.createdOn}"></td>
+        <td th:text="${user.address?.modifiedOn}"></td>
     </tr>
 </table>
 
