@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Table(name = "info")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
