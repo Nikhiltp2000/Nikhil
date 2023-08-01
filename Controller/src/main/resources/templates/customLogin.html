@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+<h1>Login</h1>
+<form th:action="@{/customLogin}" th:object="${user}"  method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" th:field="*{username}" required>    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" th:field="*{password}" required>
+    <br>
+    <button type="submit">Login</button>
+</form>
+<br>
+<p>If you forgot your password, click <a href="/forgot-password">here</a> to reset it.</p>
+</body>
+</html>

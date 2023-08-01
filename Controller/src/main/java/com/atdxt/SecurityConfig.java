@@ -50,6 +50,10 @@ public class SecurityConfig {
         auth.authenticationProvider(authenticationProvider());
     }
 
+
+
+
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -67,30 +71,17 @@ public class SecurityConfig {
 
 
 
-  /*  public UserDetailsService userDetailsService() {
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-        UserDetails admin = User.builder()
-                .username("Nikhil")
-                .password(encoder.encode("password@123"))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
-    }*/
-
-
-
-
-
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(authorize -> authorize
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/createuser").permitAll()
+                        .requestMatchers("/getdata").permitAll()
                         .anyRequest().permitAll()
                 )
                 .formLogin(formLogin ->formLogin
+                        .loginPage("/customLogin")
                         .defaultSuccessUrl("/getdata")
                 )
                 .httpBasic(withDefaults());

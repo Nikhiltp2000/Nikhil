@@ -83,28 +83,6 @@ public class UserService {
 
 
 
-    // original code
-/*    public User saveUser(User user) {
-        logger.info("Saving user: {}", user.getName());
-        user.setCreatedOn(formatDate(new Date()));
-        user.setModifiedOn(formatDate(new Date()));
-
-        if (user.getAddress() != null) {
-            Address address = user.getAddress();
-            address.setUser(user);
-            address.setCreatedOn(formatDate(new Date()));
-            address.setModifiedOn(formatDate(new Date()));
-            address.setCity(address.getCity());
-            address.setCountry(address.getCountry());
-            address.setStreet(address.getStreet());
-           // addressRepository.save(address);
-            user.setAddress(address);
-        }
-
-
-
-        return userRepository.save(user);
-    }*/
 //Save user
     public User saveUser(User user, boolean isUpdate,MultipartFile image) throws IOException  {
         logger.info("Saving user: {}", user.getName());
@@ -206,22 +184,6 @@ public class UserService {
     }
 
 
-
-
-   /* public String uploadImageToS3(MultipartFile image) throws IOException {
-        try {
-            String key = "images/" + UUID.randomUUID().toString() + "-" + image.getOriginalFilename();
-            PutObjectRequest putObjectRequest = new PutObjectRequest(awsS3BucketName, key, image.getInputStream(), new ObjectMetadata());
-            putObjectRequest.setCannedAcl(ObjectCannedACL.PUBLIC_READ);
-            s3Client.putObject(putObjectRequest);
-
-            return "https://" + awsS3BucketName + ".s3.amazonaws.com/" + key;
-        } catch (S3Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }*/
-
     @Value("${aws.accessKeyId}")
     private String awsAccessKeyId;
     {
@@ -259,15 +221,4 @@ public class UserService {
             throw e;
         }
     }
-
-  
-
-
-
-
-
-
-
-
-
 }

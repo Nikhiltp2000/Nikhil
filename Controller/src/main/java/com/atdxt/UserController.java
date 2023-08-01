@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,38 +43,20 @@ public class UserController {
 
     private final AuthRepository authRepository;
 
+
+
+
+
     @Autowired
     public UserController(UserService userService, AuthRepository authRepository) {
         this.userService = userService;
         this.authRepository = authRepository;
+
+
     }
 
 
-    // Fetch all data from the database, Return values in tabular format
-  /*  @GetMapping("/getdata")
-    public ModelAndView getAllUsers() {
-        try {
-            List<User> users = userService.getAllUsers();
-            logger.info("Returned {} users", users.size());
 
-            // Decrypt the passwords
-            for (User user : users) {
-                Auth auth = user.getAuth();
-                String decodedPassword = new String(Base64.getDecoder().decode(auth.getPassword()));
-                auth.setPassword(decodedPassword);
-            }
-
-            ModelAndView modelAndView = new ModelAndView("users");
-            modelAndView.addObject("users", users);
-            return modelAndView;
-        } catch (Exception e) {
-            logger.error("Error occurred while fetching users: {}", e.getMessage());
-            ModelAndView errorModelAndView = new ModelAndView("error");
-            errorModelAndView.addObject("errorMessage", "Error occurred while fetching users");
-            return errorModelAndView;
-        }
-    }
-*/
 
 
     @GetMapping("/getdata")
@@ -99,17 +83,6 @@ public class UserController {
                     return model;
                 }
 
-               /* if (auth != null && auth.getUser() != null && auth.getUsername() != null) {
-                    // Ensure that the Auth object, User object, and username are not null
-                    List<User> users = new ArrayList<>();
-                    users.add(auth.getUser()); // Add the user associated with the Auth object to the list
-
-                    model.setViewName("users");
-                    model.addObject("users", users);
-                    return model;
-                }*/
-
-
             }
 
         } catch (Exception e) {
@@ -121,12 +94,28 @@ public class UserController {
         return null;
     }
 
+    /*@PostMapping("/login")
+    public ModelAndView handleLogin(@RequestParam String username, @RequestParam String password) {
+        try {
+            // Perform authentication using the provided username and password
+            // You can use Spring Security's authenticationManager to authenticate the user.
+            // If authentication is successful, set the user's authentication in the security context.
 
+            // Example authentication code (using authenticationManager):
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-
-
-
-
+            // Redirect to the appropriate endpoint after successful login
+            return new ModelAndView("redirect:/getdata");
+        } catch (Exception e) {
+            logger.error("Error occurred during login: {}", e.getMessage());
+            ModelAndView errorModelAndView = new ModelAndView("error");
+            errorModelAndView.addObject("errorMessage", "Error occurred during login");
+            return errorModelAndView;
+        }
+    }*/
 
 
 
@@ -213,72 +202,10 @@ public class UserController {
         }
     }
 
-   /* @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        try {
-            Optional<User> optionalUser = userService.getUserById(id);
-            if (optionalUser.isPresent()) {
-                User existingUser = optionalUser.get();
-
-                // Update the properties of the existing user
-                if (updatedUser.getName() != null) {
-                    existingUser.setName(updatedUser.getName());
-                }
-                if (updatedUser.getEmail() != null) {
-                    existingUser.setEmail(updatedUser.getEmail());
-                }
-
-                User updatedUserResult = userService.saveUser(existingUser);
-                logger.info("Updated user with ID: {}", id);
-                return ResponseEntity.ok(updatedUserResult);
-            } else {
-                logger.warn("User with ID {} not found", id);
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            logger.error("Error occurred while updating user with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }*/
 
 
 
 
-    // create user
-       /* @PostMapping("/createuser")
-        public ResponseEntity<Object> saveUser(@RequestBody User user) {
-            try {
-                if (!userService.isValidEmail(user.getEmail())) {
-                    String errorMessage = "Invalid email format!!,Please Enter valid email id";
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("ErrorMessage", errorMessage);
-                    errorResponse.put("Input Email", user.getEmail());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
-                if (userService.isNameExists(user.getName())) {
-                    String errorMessage = "Name already exists";
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("ErrorMessage", errorMessage);
-                    errorResponse.put("Input Name", user.getName());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
-
-                if (userService.isEmailExists(user.getEmail())) {
-                    String errorMessage = "Email already exists";
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("ErrorMessage", errorMessage);
-                    errorResponse.put("Input Email", user.getEmail());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
-
-                User savedUser = userService.saveUser(user,false);
-                logger.info("Saved user: {}", savedUser.getName());
-               return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-            } catch (Exception e) {
-                logger.error("Error occurred while saving user: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-       }*/
 //post method for form (create user)
     @PostMapping("/createuser")
     public ModelAndView saveUser(@ModelAttribute("user") User user, @RequestParam("confirmPassword") String confirmPassword, @RequestParam("image") MultipartFile image) {
@@ -318,15 +245,6 @@ public class UserController {
             auth.setUsername(user.getAuth().getUsername());
             auth.setPassword(user.getAuth().getPassword());
             auth.encryptPassword();
-
-            // Encode the password using BCryptPasswordEncoder
-           /* String encodedPassword = passwordEncoder.encode(user.getAuth().getPassword());
-            auth.setPassword(encodedPassword);*/
-
-            // Encode the password in Base64
-           /* String encodedPassword = Base64.getEncoder().encodeToString(user.getAuth().getPassword().getBytes());
-            auth.setPassword(encodedPassword);*/
-
 
             // Set createdOn and modifiedOn dates
             Date currentDate = new Date();
@@ -371,39 +289,17 @@ public class UserController {
         return modelAndView;
     }
 
+    @GetMapping("/customLogin")
+    public ModelAndView showCustomLogin() {
+        ModelAndView modelAndView = new ModelAndView("customLogin");
+        modelAndView.addObject("user", new Auth());
+        return modelAndView;
+    }
 
 
-// create username and password (commented for now as username and password is now storing through the signUp form)
-  /*  @PostMapping("/createauth")
-        public ResponseEntity<String> createUser(@RequestBody Auth userEntity3) {
-            *//*try {*//*
 
-            Auth userEncrypt1 = new Auth();
-            userEncrypt1.setUsername(userEntity3.getUsername());
-            userEncrypt1.setPassword(userEntity3.getPassword());
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            userEncrypt1.setCreatedOn(sdf1.format(new Date()));
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            userEncrypt1.setModifiedOn(sdf.format(new Date()));
 
-            userEncrypt1.encryptPassword();
-            authRepository.save(userEncrypt1);
-
-            logger.info("User added successfully");
-            //    logger.info("Saved user: {}", savedUser.getName());
-            return ResponseEntity.ok("User added successfully");
-        }*/
-
-    /*    @GetMapping("/getauth")
-        public List<Auth> getUserData() {
-            List<Auth> userEncryptList = authRepository.findAll();
-            for (Auth userEntity3 : userEncryptList) {
-                userEntity3.decryptPassword();
-            }
-            logger.info("Fetching all users");
-            return userEncryptList;
-        }*/
 
     @GetMapping("/getauth")
     public ModelAndView getUserData() {
