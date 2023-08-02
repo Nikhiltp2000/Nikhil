@@ -78,6 +78,8 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/createuser").permitAll()
                         .requestMatchers("/getdata").permitAll()
+                        .requestMatchers("/forgot-password").permitAll()
+                        .requestMatchers("/reset-password").permitAll()
                         .anyRequest().permitAll()
                 )
                 .formLogin(formLogin ->formLogin

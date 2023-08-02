@@ -43,14 +43,17 @@ public class UserController {
 
     private final AuthRepository authRepository;
 
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
 
 
 
 
     @Autowired
-    public UserController(UserService userService, AuthRepository authRepository) {
+    public UserController(UserService userService, AuthRepository authRepository,PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userService = userService;
         this.authRepository = authRepository;
+        this.passwordResetTokenRepository=passwordResetTokenRepository;
 
 
     }
@@ -93,30 +96,6 @@ public class UserController {
         }
         return null;
     }
-
-    /*@PostMapping("/login")
-    public ModelAndView handleLogin(@RequestParam String username, @RequestParam String password) {
-        try {
-            // Perform authentication using the provided username and password
-            // You can use Spring Security's authenticationManager to authenticate the user.
-            // If authentication is successful, set the user's authentication in the security context.
-
-            // Example authentication code (using authenticationManager):
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            // Redirect to the appropriate endpoint after successful login
-            return new ModelAndView("redirect:/getdata");
-        } catch (Exception e) {
-            logger.error("Error occurred during login: {}", e.getMessage());
-            ModelAndView errorModelAndView = new ModelAndView("error");
-            errorModelAndView.addObject("errorMessage", "Error occurred during login");
-            return errorModelAndView;
-        }
-    }*/
-
 
 
 
@@ -296,7 +275,109 @@ public class UserController {
         return modelAndView;
     }
 
+    @GetMapping("/forgotPasswordForm")
+    public ModelAndView forgetPasswordForm() {
+        ModelAndView modelAndView = new ModelAndView("forgotPasswordForm");
+        return modelAndView;
+    }
 
+    /*@GetMapping("/reset-password")
+    public ModelAndView resetPassword() {
+        ModelAndView modelAndView = new ModelAndView("resetPassword");
+        return modelAndView;
+    }*/
+
+    @GetMapping("/reset-password")
+    public ModelAndView showResetPasswordForm(@RequestParam("token") String resetToken) {
+        ModelAndView modelAndView = new ModelAndView("resetPassword");
+        modelAndView.addObject("resetToken", resetToken); // Add the resetToken to the model
+        return modelAndView;
+    }
+
+
+
+
+    //mapping for forget password
+    @PostMapping("/forgot-password")
+    public ModelAndView forgotPassword(@RequestParam("email") String email) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        if (!userService.isValidEmail(email)) {
+            String errorMessage = "Invalid email format! Please enter a valid email address.";
+            modelAndView.addObject("errorMessage", errorMessage);
+            modelAndView.setViewName("forgotPasswordForm");
+            return modelAndView;
+        }
+
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            String errorMessage = "No user found with this email address.";
+            modelAndView.addObject("errorMessage", errorMessage);
+            modelAndView.setViewName("forgotPasswordForm");
+            return modelAndView;
+        }
+
+        // Generate a password reset token and send an email
+        String resetToken = userService.generateResetToken(user);
+        //String resetToken = generateResetToken(user);
+        userService.sendPasswordResetEmail(user, resetToken);
+
+        modelAndView.addObject("message", "Password reset email has been sent to your email address.");
+        modelAndView.setViewName("forgotPasswordSuccess");
+        return modelAndView;
+    }
+
+
+    @PostMapping("/reset-password")
+    public ModelAndView resetPassword(@RequestParam("token") String resetToken,
+                                      @RequestParam("password") String newPassword)
+                                     /* @RequestParam("confirmPassword") String confirmPassword)*/ {
+        logger.info("Resetting password for token: {}", resetToken);
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Retrieve the PasswordResetToken entity using the token
+        PasswordResetToken tokenEntity = passwordResetTokenRepository.findByToken(resetToken);
+
+        System.out.println("token :"+ tokenEntity);
+
+        if (tokenEntity == null) {
+            logger.error("Invalid reset token (): {}", resetToken);
+            // Handle invalid token case
+            modelAndView.addObject("errorMessage", "Invalid reset token.");
+            modelAndView.setViewName("resetPassword");
+            return modelAndView;
+        }
+
+        // Check if the token is expired
+        if (tokenEntity.getExpiryDate().before(new Date())) {
+            logger.warn("Reset token has expired: {}", resetToken);
+            modelAndView.addObject("errorMessage", "Reset token has expired.");
+            modelAndView.setViewName("resetPassword");
+            return modelAndView;
+        }
+
+        // Verify password and confirm password match
+       /* if (!newPassword.equals(confirmPassword)) {
+            modelAndView.addObject("errorMessage", "Passwords do not match.");
+            modelAndView.setViewName("resetPassword");
+            return modelAndView;
+        }*/
+
+        // Update the  password
+        User user = tokenEntity.getUser();
+        userService.updatePassword(resetToken, newPassword);
+
+        logger.info("Password reset successfully for user: {}");
+
+        // Delete token
+        passwordResetTokenRepository.delete(tokenEntity);
+
+        modelAndView.addObject("message", "Password has been reset successfully.");
+        modelAndView.setViewName("resetPasswordSuccess");
+        logger.info("Password reset process completed successfully.");
+        return modelAndView;
+    }
 
 
 

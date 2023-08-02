@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 //import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
@@ -32,6 +34,11 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
+
+
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+
 
 
 
@@ -49,16 +56,22 @@ public class UserService {
 
 //    private final String awsS3BucketName;
 
+    private final JavaMailSender javaMailSender;
 
+
+
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
 
     @Autowired
-    public UserService(UserRepository userRepository, AddressRepository addressRepository, AuthRepository authRepository,S3Client s3Client) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository, AuthRepository authRepository,S3Client s3Client,PasswordResetTokenRepository passwordResetTokenRepository,JavaMailSender javaMailSender) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.authRepository= authRepository;
         this.s3Client = s3Client;
-//        this.awsS3BucketName = awsS3BucketName;
+        this.passwordResetTokenRepository= passwordResetTokenRepository;
+        this.javaMailSender=javaMailSender;
+
 
     }
     //Get all users
@@ -182,6 +195,74 @@ public class UserService {
         return authRepository.findByUsername(username)
                 .orElse(null);
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+
+    //Generate token
+    public String generateResetToken(User user) {
+
+        String resetTokenValue = UUID.randomUUID().toString();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR, 1); // Set the expiration time (1 hour from now)
+        Date expirationDate = cal.getTime();
+
+        PasswordResetToken resetToken = new PasswordResetToken( resetTokenValue,expirationDate);
+
+        resetToken.setUser(user);
+      //  resetToken.setToken(resetTokenValue);
+        passwordResetTokenRepository.save(resetToken);
+
+        return resetTokenValue;
+    }
+
+
+    //Send reset password link to email
+    public void sendPasswordResetEmail(User user, String resetToken) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Password Reset");
+        message.setText("Click the following link to reset your password:\n"
+                + "http://localhost:8080/reset-password?token=" + resetToken);
+
+        javaMailSender.send(message);
+    }
+
+
+    //update email
+    public ResponseEntity<String> updatePassword(String token, String password) {
+        logger.info("Updating password for token: {}", token);
+
+        PasswordResetToken emailForget = passwordResetTokenRepository.findByToken(token);
+        logger.warn("Invalid or expired token: {}", token);
+        if (emailForget == null || emailForget.getExpiryDate().before(new Date())) {
+            // Invalid or expired token, return appropriate response
+            return ResponseEntity.badRequest().body("Invalid or expired token.");
+        }
+
+        User user = emailForget.getUser();
+        Auth userEncrypt = user.getAuth();
+
+        // Update the user's encrypted password and save it in the database
+        userEncrypt.setPassword(password);
+        userEncrypt.encryptPassword();
+        authRepository.save(userEncrypt);
+
+        logger.info("Password updated successfully for user: {}");
+
+        // Delete the used token from the database
+        passwordResetTokenRepository.delete(emailForget);
+
+        logger.info("Password update process completed successfully.");
+
+        // Return success response
+        return ResponseEntity.ok("Password updated successfully.");
+    }
+
 
 
     @Value("${aws.accessKeyId}")

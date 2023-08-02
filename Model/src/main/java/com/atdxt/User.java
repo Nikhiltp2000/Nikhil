@@ -134,21 +134,7 @@ public class User {
         this.auth = auth;
     }
 
-//    public Timestamp getCreatedOn() {
-//        return createdOn;
-//    }
-//
-//    public void setCreatedOn(Timestamp createdOn) {
-//        this.createdOn = createdOn;
-//    }
-//
-//    public Timestamp getModifiedOn() {
-//        return modifiedOn;
-//    }
-//
-//    public void setModifiedOn(Timestamp modifiedOn) {
-//        this.modifiedOn = modifiedOn;
-//    }
+
 
     public String getCreatedOn() {
         return createdOn;
@@ -207,6 +193,7 @@ public class User {
         SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
         modifiedOn = formatter.format(currentDate);
     }
+
 
 }
 
