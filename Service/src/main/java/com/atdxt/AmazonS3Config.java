@@ -13,7 +13,7 @@ public class AmazonS3Config {
 
     @Bean
     public S3Client s3Client() {
-        Region region = Region.AP_SOUTH_1;
+        Region region = Region.EU_NORTH_1;
         return S3Client.builder()
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .region(region)
