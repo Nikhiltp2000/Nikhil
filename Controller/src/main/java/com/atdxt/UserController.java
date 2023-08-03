@@ -67,10 +67,12 @@ public class UserController {
         try {
             logger.info("Fetching all users");
             String username = principal.getName();
+            logger.info("Logged in user's username: {}", username);
+
 
             if (username.equals("Admin")) {
                 List<User> users = userService.getAllUsers();
-
+                logger.debug("Admin user is accessing all users.");
                 model.setViewName("users");
                 model.addObject("users", users);
                 return model;
@@ -81,10 +83,15 @@ public class UserController {
                 if (auth != null) {
                     List<User> users = new ArrayList<>();
                     users.add(auth.getUser());  // Access the associated User object using getUser()
+                    logger.info("Regular user is accessing their own data.");
                     model.setViewName("users");
                     model.addObject("users", users);
                     return model;
+                } else {
+                    logger.warn("User not found.");
+                    model.addObject("usernameNotFoundErrorMessage", "Username not found.");
                 }
+
 
             }
 
@@ -331,8 +338,8 @@ public class UserController {
 
     @PostMapping("/reset-password")
     public ModelAndView resetPassword(@RequestParam("token") String resetToken,
-                                      @RequestParam("password") String newPassword)
-                                     /* @RequestParam("confirmPassword") String confirmPassword)*/ {
+                                      @RequestParam("password") String newPassword,
+                                      @RequestParam("confirmPassword") String confirmPassword) {
         logger.info("Resetting password for token: {}", resetToken);
         ModelAndView modelAndView = new ModelAndView();
 
@@ -358,15 +365,24 @@ public class UserController {
         }
 
         // Verify password and confirm password match
-       /* if (!newPassword.equals(confirmPassword)) {
+        if (!newPassword.equals(confirmPassword)) {
             modelAndView.addObject("errorMessage", "Passwords do not match.");
             modelAndView.setViewName("resetPassword");
             return modelAndView;
-        }*/
+        }
 
         // Update the  password
         User user = tokenEntity.getUser();
         userService.updatePassword(resetToken, newPassword);
+
+        // Update the ModifiedOn timestamp
+        Auth auth = user.getAuth();
+        Date currentDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+        String currentDateTime = formatter.format(currentDate);
+        auth.setModifiedOn(currentDateTime);
+        authRepository.save(auth);
+
 
         logger.info("Password reset successfully for user: {}");
 

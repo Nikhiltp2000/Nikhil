@@ -4,18 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 50px auto;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+          .error-message {
+            color: #dc3545;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+    </style>
 </head>
 <body>
-<h1>Login</h1>
-<form th:action="@{/customLogin}" th:object="${user}"  method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" th:field="*{username}" required>    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" th:field="*{password}" required>
+<div class="container">
+    <h1>Login</h1>
+    <form th:action="@{/customLogin}" th:object="${user}" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" th:field="*{username}" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" th:field="*{password}" required>
+        <button type="submit">Login</button>
+
+        <div th:if="${errorMessage}" class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+
+    </form>
     <br>
-    <button type="submit">Login</button>
-</form>
-<br>
- <a th:href="@{/forgotPasswordForm}">forget password </a>
+    <a th:href="@{/forgotPasswordForm}">Forgot password?</a>
+</div>
 </body>
 </html>
