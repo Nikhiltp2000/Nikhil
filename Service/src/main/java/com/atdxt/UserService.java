@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -62,15 +63,17 @@ public class UserService {
 
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
+    private  Environment environment;
 
     @Autowired
-    public UserService(UserRepository userRepository, AddressRepository addressRepository, AuthRepository authRepository,S3Client s3Client,PasswordResetTokenRepository passwordResetTokenRepository,JavaMailSender javaMailSender) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository, AuthRepository authRepository,S3Client s3Client,PasswordResetTokenRepository passwordResetTokenRepository,JavaMailSender javaMailSender,Environment environment) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.authRepository= authRepository;
         this.s3Client = s3Client;
         this.passwordResetTokenRepository= passwordResetTokenRepository;
         this.javaMailSender=javaMailSender;
+        this.environment=environment;
 
 
     }
@@ -223,11 +226,14 @@ public class UserService {
 
     //Send reset password link to email
     public void sendPasswordResetEmail(User user, String resetToken) {
+
+        String url = environment.getProperty("app.url");
+        System.out.println("Environment :"+ url);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
         message.setSubject("Password Reset");
         message.setText("Click the following link to reset your password:\n"
-                + "http://localhost:8080/reset-password?token=" + resetToken);
+                +url+ "/reset-password?token=" + resetToken);
 
         javaMailSender.send(message);
     }
